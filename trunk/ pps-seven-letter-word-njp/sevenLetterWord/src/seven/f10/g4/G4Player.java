@@ -10,7 +10,7 @@ public class G4Player implements Player {
 	@Override
 	public void Register() {
 		// TODO Auto-generated method stub 
-
+		System.out.print("jdjksnd");
 	}
 
 	@Override

@@ -1,7 +1,5 @@
 package seven.f10.g4;
-
 import java.util.ArrayList;
-
 import seven.ui.Letter;
 import seven.ui.Player;
 import seven.ui.PlayerBids;
@@ -11,8 +9,8 @@ public class G4Player implements Player {
 
 	@Override
 	public void Register() {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub 
+
 	}
 
 	@Override

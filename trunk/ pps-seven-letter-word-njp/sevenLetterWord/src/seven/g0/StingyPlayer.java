@@ -10,7 +10,6 @@ import seven.ui.SecretState;
 
 public class StingyPlayer implements Player {
 
-
 	static final Word[] wordlist;
 
 	static {
@@ -18,7 +17,8 @@ public class StingyPlayer implements Player {
 		String line = null;
 		ArrayList<Word> wtmp = new ArrayList<Word>(55000);
 		try {
-			r = new BufferedReader(new FileReader("src/seven/g1/super-small-wordlist.txt"));
+			r = new BufferedReader(new FileReader(
+					"src/seven/g1/super-small-wordlist.txt"));
 			while (null != (line = r.readLine())) {
 				wtmp.add(new Word(line.trim()));
 			}

@@ -11,7 +11,6 @@ import seven.ui.SecretState;
 public class StingyPlayer implements Player {
 
 	static final Word[] wordlist;
-
 	static {
 		BufferedReader r;
 		String line = null;

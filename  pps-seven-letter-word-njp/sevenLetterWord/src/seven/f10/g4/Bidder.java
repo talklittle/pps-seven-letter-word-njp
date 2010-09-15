@@ -8,7 +8,7 @@ public class Bidder {
 	private static final String MID = "MID";
 	private static final String HIGH = "HIGH";
 	private static final int HIGH_BID = 10;
-	private static final int MID_BID = 5;
+	private static final int MID_BID = 4;
 	private static final int LOW_BID = 1;
 	private SevenLetterWordHelper sevenLetterWordHelper;
 	private int numberOfSevenLetterWords;
@@ -17,7 +17,6 @@ public class Bidder {
 	
 	
 	public void setBidLevels() {
-		System.err.println("here Iam!");
 		bidLevels=new HashMap<String, ArrayList<Character>>();
 		sevenLetterWordHelper=new SevenLetterWordHelper(); 
 		ArrayList<Character> highBids=new ArrayList<Character>();
@@ -41,7 +40,6 @@ public class Bidder {
 	}
 
 	public int getBidAmount(Character targetCharacter) {
-		System.err.println("here!");
 		setBidLevels();
 		if(bidLevels.get(HIGH).contains(targetCharacter)){
 			return HIGH_BID;

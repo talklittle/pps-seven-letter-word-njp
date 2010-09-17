@@ -23,8 +23,7 @@ public class Bidder {
 		ArrayList<Character> midBids=new ArrayList<Character>();
 		ArrayList<Character> lowBids=new ArrayList<Character>();
 		for(Character c: frequencyMap.keySet()){
-			System.err.println("Frequency Map "+c+frequencyMap.get(c)+" total "+numberOfSevenLetterWords);
-			if(4*frequencyMap.get(c)>=numberOfSevenLetterWords){
+			if(2*frequencyMap.get(c)>=numberOfSevenLetterWords){
 				highBids.add(c);
 			}
 			else if(2*frequencyMap.get(c)<numberOfSevenLetterWords && 4*frequencyMap.get(c)>=numberOfSevenLetterWords){

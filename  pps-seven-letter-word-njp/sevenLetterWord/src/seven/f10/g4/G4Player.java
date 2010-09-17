@@ -76,6 +76,7 @@ public class G4Player implements Player {
 			wordInRack=createWordFromLettersOnRack(rack);
 			possibleSevenLetterWords=sevenLetterWordHelper.getSevenLetterWords(wordInRack);
 			bidder.setNumberOfSevenLetterWords(possibleSevenLetterWords.size());
+			//ToDo increment the game status.(next turn , )
 		}
 	}
 	@Override

@@ -17,6 +17,24 @@ public class Status {
 	
 	private ArrayList<Opponent> opponentList;
 	
+	public Integer getNoOfPlayers() {
+		return noOfPlayers;
+	}
+
+	public void setNoOfPlayers(Integer noOfPlayers) {
+		this.noOfPlayers = noOfPlayers;
+	}
+
+	public ArrayList<Opponent> getOpponentList() {
+		return opponentList;
+	}
+
+	public void addOpponentToList(Integer id) {
+		if(opponentList.contains(new Opponent(id))) {
+			this.opponentList.add(new Opponent(id));
+		}
+	}
+
 	public void updateTurnAndGame(PlayerBids lastBid) {
 		turn++;
 		if(turn == 8*noOfPlayers) {

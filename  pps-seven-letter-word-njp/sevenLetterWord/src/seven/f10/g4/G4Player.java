@@ -21,6 +21,7 @@ public class G4Player implements Player {
 	private Word wordInRack = new Word("");
 	private int id;
 	private Bidder bidder = new Bidder();
+	private Status gameStatus = new Status();
 
 	private Integer toBeRemoved = 0;
 	static {
@@ -57,6 +58,7 @@ public class G4Player implements Player {
 			int total_rounds, ArrayList<String> PlayerList,
 			SecretState secretState, int PlayerID) {
 		history = PlayerBidList;
+				
 		if (rack.isEmpty()) { // First Bid is about to happen
 			rack.addAll(secretState.getSecretLetters());
 			id = PlayerID;

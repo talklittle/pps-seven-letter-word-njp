@@ -21,6 +21,7 @@ public class G4Player implements Player {
 	private int id;
 	private Bidder bidder=new Bidder();
 	
+	private Integer toBeRemoved = 0;
 	static{
 		dictionary=new ArrayList<Word>();
 		allSevenLetterWords=new ArrayList<Word>();

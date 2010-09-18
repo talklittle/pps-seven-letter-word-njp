@@ -72,6 +72,12 @@ public class G4Player implements Player {
 			return bidder.getBidAmount(bidLetter.getAlphabet());
 		} else {
 			checkIfWeWon(history.get(history.size() - 1));
+			if (wordInRack.getLength() >= 7) {
+				if (sevenLetterWordExists()) {
+					return 1; // I already have a seven letter word and bid low.
+
+				}
+			}
 			return bidder.getBidAmount(bidLetter.getAlphabet());
 		}
 	}
@@ -135,5 +141,15 @@ public class G4Player implements Player {
 			}
 		}
 		return bestSevenLetterWord;
+	}
+
+	private boolean sevenLetterWordExists() {
+		for (Word dictWord : dictionary) {
+			if (wordInRack.isInDictionary(dictWord)) {
+				return true;
+			}
+		}
+		return false;
+
 	}
 }

@@ -70,6 +70,7 @@ public class G4Player implements Player {
 			bidder.setFrequencyMap(sevenLetterWordHelper.getFrequencyMap());
 			if (history.size() > 0) {
 				checkIfWeWon(history.get(history.size() - 1));
+				
 			}
 			return bidder.getBidAmount(bidLetter.getAlphabet());
 		} else {
@@ -85,6 +86,7 @@ public class G4Player implements Player {
 	}
 
 	private void checkIfWeWon(PlayerBids lastBid) {
+		gameStatus.updateTurnAndGame(lastBid);
 		if (id == lastBid.getWinnerID()) { // Yay we won the bid.
 			rack.add(lastBid.getTargetLetter());
 			wordInRack = createWordFromLettersOnRack(rack);

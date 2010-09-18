@@ -9,13 +9,13 @@ import seven.ui.GameResult;
 
 public class Status {
 
-	private Integer game;
-	private Integer turn;
-	private Integer noOfPlayers;
-	private HashMap<Letter, Integer> winningBids; //what was the winning bid on each letter
-	private HashMap<Integer, Integer> scoreSoFar; //(id, score)
+	private Integer game=0;
+	private Integer turn=0;
+	private Integer noOfPlayers=0;
+	private HashMap<Letter, Integer> winningBids = new HashMap<Letter, Integer>(); //what was the winning bid on each letter
+	private HashMap<Integer, Integer> scoreSoFar = new HashMap<Integer, Integer>(); //(id, score)
 	
-	private ArrayList<Opponent> opponentList;
+	private ArrayList<Opponent> opponentList = new ArrayList<Opponent>();
 	
 	public Integer getNoOfPlayers() {
 		return noOfPlayers;
@@ -42,7 +42,7 @@ public class Status {
 		}
 		Letter a = lastBid.getTargetLetter();
 		winningBids.put(a,lastBid.getWinAmmount());
-		
+		addOpponentToList(lastBid.getWinnerID());
 		for(int i = 0; i < opponentList.size(); i++) {
 			Opponent o = opponentList.get(i);
 			if (o.getID() == lastBid.getWinnerID()) {
@@ -64,5 +64,4 @@ public class Status {
 	public Integer winningBid(Letter l) {
 		return winningBids.get(l);
 	}
-	
 }

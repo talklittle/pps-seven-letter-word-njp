@@ -58,7 +58,7 @@ public class G4Player implements Player {
 			int total_rounds, ArrayList<String> PlayerList,
 			SecretState secretState, int PlayerID) {
 		history = PlayerBidList;
-				
+		System.err.println("points "+points );
 		if (rack.isEmpty()) { // First Bid is about to happen
 			rack.addAll(secretState.getSecretLetters());
 			id = PlayerID;
@@ -88,12 +88,12 @@ public class G4Player implements Player {
 	private void checkIfWeWon(PlayerBids lastBid) {
 		gameStatus.updateTurnAndGame(lastBid);
 		if (id == lastBid.getWinnerID()) { // Yay we won the bid.
+			points-=lastBid.getWinAmmount();
 			rack.add(lastBid.getTargetLetter());
 			wordInRack = createWordFromLettersOnRack(rack);
 			possibleSevenLetterWords = sevenLetterWordHelper
 					.getSevenLetterWords(wordInRack);
 			bidder.setNumberOfSevenLetterWords(possibleSevenLetterWords.size());
-			// ToDo increment the game status.(next turn , )
 		}
 	}
 

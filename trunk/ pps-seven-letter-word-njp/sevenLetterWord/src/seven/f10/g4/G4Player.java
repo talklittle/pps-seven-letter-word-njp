@@ -99,6 +99,7 @@ public class G4Player implements Player {
 
 	@Override
 	public String returnWord() {
+		checkIfWeWon(history.get(history.size()-1));
 		String bestString = "";
 		boolean foundSevenLetterWord = false;
 		ArrayList<Word> sevenLetterWordsSeen = new ArrayList<Word>();

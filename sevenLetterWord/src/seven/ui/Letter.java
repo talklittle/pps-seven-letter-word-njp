@@ -30,13 +30,5 @@ public class Letter {
 	public int getValue() {
 		return value;
 	}
-	
-	public int hashCode() {
-		return alphabet.hashCode();
-	}
-	
-	public boolean equals(Object o) {
-		return (o instanceof Letter) && alphabet.equals(((Letter)o).alphabet);
-	}
 
 }

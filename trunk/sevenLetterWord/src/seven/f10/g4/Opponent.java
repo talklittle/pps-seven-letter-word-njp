@@ -32,7 +32,7 @@ public class Opponent {
 	}
 	
 	public void bidUpdate(Letter a, int value) {
-		bidHistory[a.getAlphabet() - 'A'] = value; //check this!
+		bidHistory[Util.getIndexFromChar(a.getAlphabet())] = value; //check this!
 	}
 	
 	public Integer getID() {

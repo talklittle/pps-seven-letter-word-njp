@@ -33,6 +33,10 @@ public class Opponent {
 		rack.clear();
 	}
 	
+	public Integer getSpend() {
+		return spendSoFar;
+	}
+	
 	public void bidUpdate(Letter a, int value) {
 		bidHistory[Util.getIndexFromChar(a.getAlphabet())] = value; //changed this
 	}

@@ -39,6 +39,7 @@ public class Status {
 		turn++;
 		if(turn == 8*noOfPlayers) {
 			game++;
+			turn = 0;
 		}
 		Letter a = lastBid.getTargetLetter();
 		winningBids.put(a,lastBid.getWinAmmount());
@@ -52,13 +53,30 @@ public class Status {
 	}
 	
 	public void updateScore(Opponent o, int value) {
-		Integer scoreNow = scoreSoFar.get(o);
+		Integer scoreNow = scoreSoFar.get(o.getID());
 		scoreSoFar.put(o.getID(), scoreNow + value);
 	}
 	
+	public Integer opponentScore(int id) {
+		return scoreSoFar.get(id);
+	}
 	
 	public Integer opponentScore(Opponent o) {
-		return scoreSoFar.get(o);
+		return opponentScore(o.getID());
+	}
+	
+	public Integer opponentSpend(int id) {
+		for (Opponent o : opponentList) {
+			if (o.getID() == id) {
+				return opponentSpend(o);
+			}
+		}
+		// FIXME should throw exception
+		return 0;
+	}
+	
+	public Integer opponentSpend(Opponent o) {
+		return o.getSpend();
 	}
 	
 	public Integer winningBid(Letter l) {

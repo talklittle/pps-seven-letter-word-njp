@@ -72,7 +72,9 @@ public class G4Player implements Player {
 				checkIfWeWon(history.get(history.size() - 1));
 				
 			}
-			return bidder.getBidAmount(bidLetter.getAlphabet());
+			
+			return bidder.getBidAmount(bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
+			
 		} else {
 			checkIfWeWon(history.get(history.size() - 1));
 			if (wordInRack.getLength() >= 7) {
@@ -81,7 +83,7 @@ public class G4Player implements Player {
 
 				}
 			}
-			return bidder.getBidAmount(bidLetter.getAlphabet());
+			return bidder.getBidAmount(bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
 		}
 	}
 

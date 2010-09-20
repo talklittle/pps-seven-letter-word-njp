@@ -30,7 +30,7 @@ public class Status {
 	}
 
 	public void addOpponentToList(Integer id) {
-		if(opponentList.contains(new Opponent(id))) {
+		if(!opponentList.contains(new Opponent(id))) {
 			this.opponentList.add(new Opponent(id));
 		}
 	}

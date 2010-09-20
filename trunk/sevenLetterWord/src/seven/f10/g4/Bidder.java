@@ -47,8 +47,7 @@ public class Bidder {
 	private int getBidBase(Character targetCharacter, int spentSoFar, int rackSize) {
 		if (rackSize < 7)
 			return (ASSUMED_WORD_SCORE - spentSoFar) / (7 - rackSize);
-		// if we already have 7-letter word, we can bid until we reach equity.
-		return Math.max(1, ASSUMED_WORD_SCORE - spentSoFar);
+		return (ASSUMED_WORD_SCORE - spentSoFar) / (2); // temp fix to make sure our bidding does not stop before getting a 7 letter word.
 	}
 
 	private float getBidMultiplier(Character targetCharacter) {

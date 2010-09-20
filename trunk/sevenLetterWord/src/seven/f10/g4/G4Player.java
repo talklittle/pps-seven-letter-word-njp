@@ -58,7 +58,7 @@ public class G4Player implements Player {
 			int total_rounds, ArrayList<String> PlayerList,
 			SecretState secretState, int PlayerID) {
 		history = PlayerBidList;
-		System.err.println("points "+points );
+		//System.err.println("points "+points );
 		if (rack.isEmpty()) { // First Bid is about to happen
 			rack.addAll(secretState.getSecretLetters());
 			id = PlayerID;

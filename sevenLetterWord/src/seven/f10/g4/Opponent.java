@@ -30,6 +30,10 @@ public class Opponent {
 		spendSoFar = 0;
 	}
 	
+	public int getSpend(){
+		return spendSoFar;
+	}
+	
 	public void resetRack() {
 		rack.clear();
 	}

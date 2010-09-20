@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import seven.ui.Letter;
+import seven.ui.PlayerBids;
 
 public class Opponent {
 
@@ -33,12 +34,16 @@ public class Opponent {
 		rack.clear();
 	}
 	
-	public Integer getSpend() {
-		return spendSoFar;
-	}
-	
-	public void bidUpdate(Letter a, int value) {
-		bidHistory[Util.getIndexFromChar(a.getAlphabet())] = value; //changed this
+	public void updateBid(PlayerBids lastBid) {
+		Letter a = lastBid.getTargetLetter();
+		bidHistory[Util.getIndexFromChar(a.getAlphabet())] = lastBid.getBidvalues().get(getID()); 
+		if (getID() == lastBid.getWinnerID()) {
+			int winningAmount = lastBid.getWinAmmount(); //is this reflecting the vickery auction? (is this second best?
+			updateSpend(winningAmount);
+			updateRack(a);
+		}
+		
+		
 	}
 	
 	public Integer getID() {
@@ -69,4 +74,5 @@ public class Opponent {
 			return false;
 		return true;
 	}
+
 }

@@ -30,7 +30,7 @@ public class Util {
 	 * Can be used keep track of frequencies or avaraged bidding amounts by players
 	 * @returns
 	 */
-	public static HashMap<Character, Integer> getAlphabetToIntMap()
+	public static HashMap<Character, Integer> createAlphabetToIntMap()
 	{
 		HashMap<Character, Integer> map = new HashMap<Character, Integer>();
 		for (int i = 0; i < alphabet.length; i++) {
@@ -39,10 +39,20 @@ public class Util {
 		return map;
 	}
 	
+	/**
+	 * get the index corresponding to character c, for example a = 0, and z = 25;
+	 * @param c
+	 * @return
+	 */
 	public static int getIndexFromChar(Character c){
 		return charToIndexMap.get(c);
 	}
 	
+	/**
+	 * get the char corresponding to the index i, for example 0 = a, and 25 = z;
+	 * @param c
+	 * @return
+	 */
 	public static Character getCharFromIndex(int i){
 		return new Character(alphabet[i]); 
 	}

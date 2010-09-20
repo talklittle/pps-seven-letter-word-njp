@@ -10,14 +10,15 @@ import seven.ui.SecretState;
 
 public class StingyPlayer implements Player {
 
+
 	static final Word[] wordlist;
+
 	static {
 		BufferedReader r;
 		String line = null;
 		ArrayList<Word> wtmp = new ArrayList<Word>(55000);
 		try {
-			r = new BufferedReader(new FileReader(
-					"src/seven/g1/super-small-wordlist.txt"));
+			r = new BufferedReader(new FileReader("src/seven/g1/super-small-wordlist.txt"));
 			while (null != (line = r.readLine())) {
 				wtmp.add(new Word(line.trim()));
 			}
@@ -43,7 +44,7 @@ public class StingyPlayer implements Player {
 		}
 
 		if (null == currentLetters) {
-			currentLetters = new ArrayList<Character>(7);
+			currentLetters = new ArrayList<Character>();
 			ourID = PlayerID;
 			for (Letter l : secretstate.getSecretLetters()) {
 				currentLetters.add(l.getAlphabet());
@@ -69,8 +70,8 @@ public class StingyPlayer implements Player {
 
 	public String returnWord() {
 		checkBid(cachedBids.get(cachedBids.size() - 1));
-		char c[] = new char[7];
-		for (int i = 0; i < 7; i++) {
+		char c[] = new char[currentLetters.size()];
+		for (int i = 0; i < c.length; i++) {
 			c[i] = currentLetters.get(i);
 		}
 		String s = new String(c);

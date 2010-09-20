@@ -1,6 +1,7 @@
 package seven.f10.g4;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import seven.ui.Letter;
 
@@ -10,6 +11,7 @@ public class Opponent {
 	private Integer[] bidHistory = new Integer[26]; //the history of bidding for this player on each letter.
 	private Integer spendSoFar = 0; //for each game
 	private Integer id;
+	public HashMap<Character, Integer> expectedBids = Util.createAlphabetToIntMap();
 	
 	public Opponent(Integer id){
 		this.id = id;
@@ -32,7 +34,7 @@ public class Opponent {
 	}
 	
 	public void bidUpdate(Letter a, int value) {
-		bidHistory[Util.getIndexFromChar(a.getAlphabet())] = value; //check this!
+		bidHistory[Util.getIndexFromChar(a.getAlphabet())] = value; //changed this
 	}
 	
 	public Integer getID() {

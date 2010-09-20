@@ -46,14 +46,12 @@ public class Status {
 		addOpponentToList(lastBid.getWinnerID());
 		for(int i = 0; i < opponentList.size(); i++) {
 			Opponent o = opponentList.get(i);
-			if (o.getID() == lastBid.getWinnerID()) {
-				o.updateSpend(lastBid.getWinAmmount()); //is this reflecting the vickery auction? (is this second best?
-			}
+			o.updateBid(lastBid);
 		}
 	}
 	
 	public void updateScore(Opponent o, int value) {
-		Integer scoreNow = scoreSoFar.get(o.getID());
+		Integer scoreNow = scoreSoFar.get(o);
 		scoreSoFar.put(o.getID(), scoreNow + value);
 	}
 	
@@ -62,7 +60,7 @@ public class Status {
 	}
 	
 	public Integer opponentScore(Opponent o) {
-		return opponentScore(o.getID());
+		return scoreSoFar.get(o.getID());
 	}
 	
 	public Integer opponentSpend(int id) {
@@ -78,7 +76,6 @@ public class Status {
 	public Integer opponentSpend(Opponent o) {
 		return o.getSpend();
 	}
-	
 	public Integer winningBid(Letter l) {
 		return winningBids.get(l);
 	}

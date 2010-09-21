@@ -7,9 +7,9 @@ public class Bidder {
 	private static final String LOW = "LOW";
 	private static final String MID = "MID";
 	private static final String HIGH = "HIGH";
-	private static final float HIGH_BID = 1.5f;
-	private static final float MID_BID = 1.0f;
-	private static final float LOW_BID = 0.5f;
+	private static final float HIGH_BID = 0.90f;
+	private static final float MID_BID = 0.60f;
+	private static final float LOW_BID = 0.40f;
 	private static final int ASSUMED_WORD_SCORE = 60;
 	
 	private SevenLetterWordHelper sevenLetterWordHelper;

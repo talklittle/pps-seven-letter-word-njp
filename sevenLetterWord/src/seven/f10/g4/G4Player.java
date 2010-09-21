@@ -79,6 +79,7 @@ public class G4Player implements Player {
 			checkIfWeWon(history.get(history.size() - 1));
 			if (wordInRack.getLength() >= 7) {
 				if (sevenLetterWordExists()) {
+					System.err.println("found seven letter word");
 					return 1; // I already have a seven letter word and bid low.
 
 				}
@@ -152,8 +153,11 @@ public class G4Player implements Player {
 
 	private boolean sevenLetterWordExists() {
 		for (Word dictWord : dictionary) {
-			if (wordInRack.isInDictionary(dictWord)) {
-				return true;
+			if(dictWord.getLength()==7){
+				if (wordInRack.isInDictionary(dictWord)) {
+					System.err.println("seven letter word is "+wordInRack.getWord()+" "+dictWord.getWord());
+					return true;
+				}
 			}
 		}
 		return false;

@@ -79,4 +79,9 @@ public class Status {
 	public Integer winningBid(Letter l) {
 		return winningBids.get(l.getValue());
 	}
+
+	public int getMaxExpectedBid(Character targetCharacter) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

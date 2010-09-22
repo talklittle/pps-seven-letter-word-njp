@@ -2,6 +2,7 @@ package seven.f10.g4;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import seven.ui.Letter;
 import seven.ui.PlayerBids;
@@ -14,7 +15,6 @@ public class Status {
 	private Integer noOfPlayers=0;
 	private HashMap<Integer, Integer> winningBids = new HashMap<Integer, Integer>(); //what was the winning bid on each letter
 	private HashMap<Integer, Integer> scoreSoFar = new HashMap<Integer, Integer>(); //(id, score)
-	
 	private ArrayList<Opponent> opponentList = new ArrayList<Opponent>();
 	
 	public Integer getNoOfPlayers() {
@@ -50,6 +50,21 @@ public class Status {
 		}
 	}
 	
+	private void resetGame() {
+		turn = 0;
+		winningBids = new HashMap<Integer, Integer>(); //what was the winning bid on each letter
+		scoreSoFar = new HashMap<Integer, Integer>(); //(id, score)
+		resetOpponents();
+	}
+	
+	private void resetOpponents(){
+		Iterator<Opponent> it = opponentList.iterator();
+		while (it.hasNext()) {
+			Opponent o = it.next();
+			o.reset();
+		}
+	}
+
 	public void updateScore(Opponent o, int value) {
 		Integer scoreNow = scoreSoFar.get(o);
 		scoreSoFar.put(o.getID(), scoreNow + value);
@@ -81,7 +96,13 @@ public class Status {
 	}
 
 	public int getMaxExpectedBid(Character targetCharacter) {
-		// TODO Auto-generated method stub
-		return 0;
+		Iterator<Opponent> it = opponentList.iterator();
+		int max = 0;
+		while (it.hasNext()) {
+			Opponent o = it.next();
+			if (max < o.expectedBids.get(targetCharacter))
+				max = o.expectedBids.get(targetCharacter);
+		}
+		return max;
 	}
 }

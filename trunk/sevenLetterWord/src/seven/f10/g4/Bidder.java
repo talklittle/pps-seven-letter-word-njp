@@ -48,16 +48,18 @@ public class Bidder {
 	public int getBidAmount(Status gameStatus, Character targetCharacter, int spentSoFar, int rackSize) {
 		int scoreToWin = (int) (getBidBase(gameStatus, targetCharacter, spentSoFar, rackSize) * getBidMultiplier(targetCharacter));
 		int scoreToLose = (int) (0.66 *  gameStatus.getMaxExpectedBid(targetCharacter));
-//		return Math.max(scoreToWin, scoreToLose);
-		return scoreToWin;
+		if(scoreToWin < scoreToLose) {
+			System.out.println("We are bidding to make the others lose! "+scoreToLose+" instead of "+scoreToWin);
+			return scoreToLose;
+		}
+		else return scoreToWin;
 	}
 	
 	private int getBidBase(Status gameStatus, Character targetCharacter, int spentSoFar, int rackSize) {
 		int remainingInBag = Math.max(1, gameStatus.getRemainingBag(targetCharacter));
 		int numTiles = 8 * gameStatus.getOpponentList().size();
 		if (rackSize < 7)
-			//return (ASSUMED_WORD_SCORE - spentSoFar) / (7 - rackSize) / remainingInBag;
-			return (ASSUMED_WORD_SCORE - spentSoFar) / remainingInBag * (98/numTiles);
+			return (ASSUMED_WORD_SCORE - spentSoFar) / (7 - rackSize);
 		return (ASSUMED_WORD_SCORE - spentSoFar) / (2); // temp fix to make sure our bidding does not stop before getting a 7 letter word.
 	}
 

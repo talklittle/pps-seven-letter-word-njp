@@ -42,10 +42,37 @@ public class Opponent {
 			int winningAmount = lastBid.getWinAmmount(); //is this reflecting the vickery auction? (is this second best?
 			updateSpend(winningAmount);
 			updateRack(a);
-			expectedBids = Util.createAlphabetToIntMap();
+			//We need to reduce the expected bid for this player on all letters, and set it to 0 for this letter just won
+			//if he has 1 letter, then reduce each expected bid by 0.85 on all others letters
+			//if 2 letters, 0.7
+			//if 3 letters, 0.55
+			//if 4 letters, 0.40
+			//if 5 letters, 0.25
+			//if 6 letters, 0.10
+			//if 7 letters just set them all to 0
+			double modifier;
+			//rack size has to be larger than 0, because he just won
+			if(rack.size() == 1)
+				modifier = 0.85;
+			else if(rack.size() == 2)
+				modifier = 0.70;
+			else if(rack.size() == 3)
+				modifier = 0.55;
+			else if(rack.size() == 4)
+				modifier = 0.40;
+			else if(rack.size() == 5)
+				modifier = 0.25;
+			else if(rack.size() == 6)
+				modifier = 0.10;
+			else modifier = 0;
+			for (int i = 0; i < Util.alphabet.length; i++) {
+				Character c = new Character(Util.alphabet[i]);
+				int oldVal = expectedBids.get(c);
+				expectedBids.put(c, (int) (modifier * oldVal));
+			}
+			expectedBids.put(a.getAlphabet(), 0);
 		}
-		
-		
+		//System.err.println("Player: "+id+", letter: "+a.getAlphabet()+", win:"+lastBid.getWinnerID()+" expected bids: "+expectedBids);
 	}
 	
 	public Integer getID() {

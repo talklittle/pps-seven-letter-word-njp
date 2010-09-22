@@ -21,7 +21,7 @@ public class G4Player implements Player {
 	private Word wordInRack = new Word("");
 	private int id;
 	private Bidder bidder = new Bidder();
-	private Status gameStatus = new Status();
+	private Status gameStatus = new Status(this);
 
 	private Integer toBeRemoved = 0;
 	static {
@@ -48,6 +48,10 @@ public class G4Player implements Player {
 		}
 
 	}
+	
+	public int getId(){
+		return id;
+	}
 
 	@Override
 	public void Register() {
@@ -62,6 +66,7 @@ public class G4Player implements Player {
 			gameStatus.initOpponents(PlayerList);
 		}
 		//System.err.println("points "+points );
+		int score;
 		if (rack.isEmpty()) { // First Bid is about to happen
 			rack.addAll(secretState.getSecretLetters());
 			id = PlayerID;
@@ -75,12 +80,10 @@ public class G4Player implements Player {
 				checkIfWeWon(history.get(history.size() - 1));
 				
 			}
-			
-			return bidder.getBidAmount(gameStatus, bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
+			score = bidder.getBidAmount(gameStatus, bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
 			
 		} 
 		else {
-			int score;
 			if(history.size()>0) checkIfWeWon(history.get(history.size() - 1));
 			if (wordInRack.getLength() >= 6) {
 				int possiblePoints = sevenLetterWordPossible(bidLetter);
@@ -112,13 +115,15 @@ public class G4Player implements Player {
 				//System.err.println("We are using Nitin standard");
 				score = bidder.getBidAmount(gameStatus, bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
 			}
-			int scoreToLose = (int) (0.66 *  gameStatus.getMaxExpectedBid(bidLetter.getAlphabet()));
-			if(score < scoreToLose) {
-				//System.out.println("We are bidding to make the others lose! "+scoreToLose+" instead of "+score);
-				return scoreToLose;
-			}
-			return score;
 		}
+		double stl =   gameStatus.getMaxExpectedBid(bidLetter.getAlphabet());
+		int scoreToLose = (int) (0.66 *  stl );
+		System.err.println("ScoreToLose "+scoreToLose+" Score "+score + " stl "+stl);
+		if(score < scoreToLose) {
+			System.err.println("We are bidding to make the others lose! "+scoreToLose+" instead of "+score);
+			return scoreToLose;
+		}
+		return score;
 
 	}
 

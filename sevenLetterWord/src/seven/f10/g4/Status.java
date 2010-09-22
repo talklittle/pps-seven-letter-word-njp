@@ -11,11 +11,16 @@ import seven.ui.ScrabbleValues;
 
 public class Status {
 
+	private G4Player ourPlayer;
 	private Integer game=0;
 	private Integer turn=0;
 	private HashMap<Integer, Integer> scoreSoFar = new HashMap<Integer, Integer>(); //(id, score)
 	private ArrayList<Opponent> opponentList = new ArrayList<Opponent>();
 	
+	public Status(G4Player g4Player) {
+		ourPlayer = g4Player;
+	}
+
 	public void initOpponents(List<?> PlayerList) {
 		for (int i = 0; i < PlayerList.size(); i++) {
 			addOpponentToList(i);
@@ -59,7 +64,7 @@ public class Status {
 	
 	public void resetGame() {
 		turn = 0;
-		scoreSoFar = new HashMap<Integer, Integer>(); //(id, score)
+		//scoreSoFar = new HashMap<Integer, Integer>(); //(id, score)
 		resetOpponents();
 	}
 	
@@ -124,8 +129,10 @@ public class Status {
 		int max = 0;
 		while (it.hasNext()) {
 			Opponent o = it.next();
-			if (max < o.expectedBids.get(targetCharacter))
-				max = o.expectedBids.get(targetCharacter);
+			if(o.getID() != ourPlayer.getId()){
+				if (max < o.expectedBids.get(targetCharacter))
+					max = o.expectedBids.get(targetCharacter);
+			}
 		}
 		return max;
 	}

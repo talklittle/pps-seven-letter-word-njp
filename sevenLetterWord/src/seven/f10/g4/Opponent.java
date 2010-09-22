@@ -27,6 +27,7 @@ public class Opponent {
 	}
 	
 	public void updateSpend(int spend) {
+		logger.info("spentSoFar="+spendSoFar + " plus spend="+spend + " Player:"+id);
 		spendSoFar += spend;
 	}
 	

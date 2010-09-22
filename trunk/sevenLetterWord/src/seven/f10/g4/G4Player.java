@@ -5,6 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import org.apache.log4j.Logger;
+
 import seven.ui.Letter;
 import seven.ui.Player;
 import seven.ui.PlayerBids;
@@ -22,6 +25,8 @@ public class G4Player implements Player {
 	private int id;
 	private Bidder bidder = new Bidder();
 	private Status gameStatus = new Status(this);
+	
+	private Logger logger = Logger.getLogger(G4Player.class);
 
 	private Integer toBeRemoved = 0;
 	static {
@@ -65,7 +70,7 @@ public class G4Player implements Player {
 		if (gameStatus.getGame() == 0 && gameStatus.getTurn() == 0) {
 			gameStatus.initOpponents(PlayerList);
 		}
-		//System.err.println("points "+points );
+		logger.debug("points "+points );
 		int score;
 		if (rack.isEmpty()) { // First Bid is about to happen
 			rack.addAll(secretState.getSecretLetters());
@@ -88,39 +93,38 @@ public class G4Player implements Player {
 			if (wordInRack.getLength() >= 6) {
 				int possiblePoints = sevenLetterWordPossible(bidLetter);
 				if (possiblePoints > 0) {
-					//System.err.println("We are using Neetha's strategy");
-					//System.err.println("check ");
+					logger.debug("We are using Neetha's strategy");
 					Word word=new Word(getBestWord());
 					score = bidder.getCompletingBid(possiblePoints,word.getPoints() );
 					
 					//bid high on this one.
 				}
 				//else if(wordInRack.getLength()>=8){
-				//	System.err.println("We went into Flavio's restriction");
+				//	logger.debug("We went into Flavio's restriction");
 				//	score = 1 ; //  stop bidding when we have more than 8 letter and no 7 letter word.
 				//}
 				else{
 					if(wordInRack.getLength()>=7){
 						if (sevenLetterWordExists(wordInRack)) {
-							//System.err.println("found seven letter word");
+							logger.debug("found seven letter word");
 							score = 1; // I already have a seven letter word and bid low.
 						}
 					}	
-					//System.err.println("We are using Nitin standard with more than 6 letters");
+					logger.debug("We are using Nitin standard with more than 6 letters");
 					score = bidder.getBidAmount(gameStatus, bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
 				}
 
 			}
 			else{
-				//System.err.println("We are using Nitin standard");
+				logger.debug("We are using Nitin standard");
 				score = bidder.getBidAmount(gameStatus, bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
 			}
 		}
 		double stl =   gameStatus.getMaxExpectedBid(bidLetter.getAlphabet());
 		int scoreToLose = (int) (0.66 *  stl );
-		System.err.println("ScoreToLose "+scoreToLose+" Score "+score + " stl "+stl);
+		logger.debug("ScoreToLose "+scoreToLose+" Score "+score + " stl "+stl);
 		if(score < scoreToLose) {
-			System.err.println("We are bidding to make the others lose! "+scoreToLose+" instead of "+score);
+			logger.debug("We are bidding to make the others lose! "+scoreToLose+" instead of "+score);
 			return scoreToLose;
 		}
 		return score;
@@ -141,7 +145,7 @@ public class G4Player implements Player {
 
 	@Override
 	public String returnWord() {
-		gameStatus.resetGame();
+		gameStatus.newGame();
 		checkIfWeWon(history.get(history.size()-1));
 		return getBestWord();
 	}
@@ -199,7 +203,7 @@ public class G4Player implements Player {
 		for (Word dictWord : dictionary) {
 			if(dictWord.getLength()==7){
 				if (wordInRack.isInDictionary(dictWord)) {
-					//System.err.println("seven letter word is "+wordInRack.getWord()+" "+dictWord.getWord());
+					logger.debug("seven letter word is "+wordInRack.getWord()+" "+dictWord.getWord());
 					return true;
 				}
 			}
@@ -212,7 +216,7 @@ public class G4Player implements Player {
 		modifiedRack.add(addedLetter);
 		Word newWord = createWordFromLettersOnRack(modifiedRack);
 		if(sevenLetterWordExists(newWord)) {
-			//System.err.println("Completing Bid : " +newWord.getPoints());
+			logger.debug("Completing Bid : " +newWord.getPoints());
 			return newWord.getPoints();
 		}
 		return 0;

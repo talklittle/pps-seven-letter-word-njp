@@ -3,6 +3,8 @@ package seven.f10.g4;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
+
 import seven.ui.Letter;
 import seven.ui.PlayerBids;
 
@@ -13,6 +15,8 @@ public class Opponent {
 	private Integer spendSoFar = 0; //for each game
 	private Integer id;
 	public HashMap<Character, Integer> expectedBids = Util.createAlphabetToIntMap();
+	
+	private Logger logger = Logger.getLogger(Opponent.class);
 	
 	public Opponent(Integer id){
 		this.id = id;
@@ -72,7 +76,7 @@ public class Opponent {
 			}
 			expectedBids.put(a.getAlphabet(), 0);
 		}
-		//System.err.println("Player: "+id+", letter: "+a.getAlphabet()+", win:"+lastBid.getWinnerID()+" expected bids: "+expectedBids);
+		logger.debug("Player: "+id+", letter: "+a.getAlphabet()+", win:"+lastBid.getWinnerID()+" expected bids: "+expectedBids);
 	}
 	
 	public Integer getID() {

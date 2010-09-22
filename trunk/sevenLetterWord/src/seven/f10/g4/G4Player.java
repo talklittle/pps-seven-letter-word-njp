@@ -80,17 +80,23 @@ public class G4Player implements Player {
 			
 		} else {
 			if(history.size()>0) checkIfWeWon(history.get(history.size() - 1));
-			if (wordInRack.getLength() >= 7) {
-				if (sevenLetterWordExists(wordInRack)) {
-					System.err.println("found seven letter word");
-					return 1; // I already have a seven letter word and bid low.
-				} 
+			if (wordInRack.getLength() >= 6) {
 				int possiblePoints = sevenLetterWordPossible(bidLetter);
 				if (possiblePoints > 0) {
+					System.err.println("check ");
 					Word word=new Word(getBestWord());
 					return bidder.getCompletingBid(possiblePoints,word.getPoints() );
 					//bid high on this one.
 				}
+				if(wordInRack.getLength()>=8){
+					return 1; //  stop bidding when we have more than 8 letter and no 7 letter word.
+				}
+			}
+			if(wordInRack.getLength()>=7){
+			if (sevenLetterWordExists(wordInRack)) {
+				System.err.println("found seven letter word");
+				return 1; // I already have a seven letter word and bid low.
+			}
 			}
 			return bidder.getBidAmount(gameStatus, bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
 		}
@@ -177,12 +183,13 @@ public class G4Player implements Player {
 	}
 	
 	private int sevenLetterWordPossible(Letter addedLetter) {
+		System.err.println("checking possibility");
 		ArrayList<Letter> modifiedRack = new ArrayList(rack);
 		modifiedRack.add(addedLetter);
 		Word newWord = createWordFromLettersOnRack(modifiedRack);
 		if(sevenLetterWordExists(newWord)) {
-			System.err.println("Completing Bid : " + newWord + newWord.getPoints());
-			return newWord.getPoints() + 50;
+			System.err.println("Completing Bid : " +newWord.getPoints());
+			return newWord.getPoints();
 		}
 		return 0;
 	}

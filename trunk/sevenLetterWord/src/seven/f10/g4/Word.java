@@ -30,6 +30,7 @@ public class Word {
 		this.points = points;
 	}
 	public Integer getPoints() {
+		if(this.length==7) return 50+points;
 		return points;
 	}
 	public void setLength(Integer length) {

@@ -30,6 +30,10 @@ public class Opponent {
 		return spendSoFar;
 	}
 	
+	public ArrayList<Letter> getRack() {
+		return rack;
+	}
+	
 	public void updateBid(PlayerBids lastBid) {
 		Letter a = lastBid.getTargetLetter();
 		bidHistory[Util.getIndexFromChar(a.getAlphabet())] = lastBid.getBidvalues().get(getID()); 

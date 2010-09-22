@@ -3,18 +3,25 @@ package seven.f10.g4;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import seven.ui.Letter;
 import seven.ui.PlayerBids;
-import seven.ui.GameResult;
+import seven.ui.ScrabbleValues;
 
 public class Status {
 
 	private Integer game=0;
 	private Integer turn=0;
-	private HashMap<Integer, Integer> winningBids = new HashMap<Integer, Integer>(); //what was the winning bid on each letter
+	private HashMap<Character, Integer> winningBids = new HashMap<Character, Integer>(); //what was the winning bid on each letter
 	private HashMap<Integer, Integer> scoreSoFar = new HashMap<Integer, Integer>(); //(id, score)
 	private ArrayList<Opponent> opponentList = new ArrayList<Opponent>();
+	
+	public void initOpponents(List<?> PlayerList) {
+		for (int i = 0; i < PlayerList.size(); i++) {
+			addOpponentToList(i);
+		}
+	}
 
 	public ArrayList<Opponent> getOpponentList() {
 		return opponentList;
@@ -33,7 +40,7 @@ public class Status {
 			turn = 0;
 		}
 		Letter a = lastBid.getTargetLetter();
-		winningBids.put(a.getValue(),lastBid.getWinAmmount());
+		winningBids.put(a.getAlphabet(),lastBid.getWinAmmount());
 		addOpponentToList(lastBid.getWinnerID());
 		for(int i = 0; i < opponentList.size(); i++) {
 			Opponent o = opponentList.get(i);
@@ -41,9 +48,18 @@ public class Status {
 		}
 	}
 	
+	public int getGame() {
+		return game;
+	}
+	
+	public int getTurn() {
+		return turn;
+	}
+	
+	
 	private void resetGame() {
 		turn = 0;
-		winningBids = new HashMap<Integer, Integer>(); //what was the winning bid on each letter
+		winningBids = new HashMap<Character, Integer>(); //what was the winning bid on each letter
 		scoreSoFar = new HashMap<Integer, Integer>(); //(id, score)
 		resetOpponents();
 	}
@@ -83,7 +99,28 @@ public class Status {
 		return o.getSpend();
 	}
 	public Integer winningBid(Letter l) {
-		return winningBids.get(l.getValue());
+		return winningBids.get(l.getAlphabet());
+	}
+	
+	/**
+	 * Get the max number of remaining letters in the bag of this character.
+	 * Note that hidden tiles are not considered (therefore this is a max).
+	 * @param c
+	 * @return
+	 */
+	public Integer getRemainingBag(Character c) {
+		int numInBag = ScrabbleValues.getLetterFrequency(c);
+		for (Opponent o : opponentList) {
+			List<Letter> rack = o.getRack();
+			for (Letter letter : rack) {
+				if (c.equals(letter.getAlphabet())) {
+					numInBag--;
+					if (numInBag == 0)
+						return 0;
+				}
+			}
+		}
+		return numInBag;
 	}
 
 	public int getMaxExpectedBid(Character targetCharacter) {

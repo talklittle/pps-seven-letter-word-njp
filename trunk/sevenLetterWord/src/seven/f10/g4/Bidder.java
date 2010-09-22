@@ -40,6 +40,11 @@ public class Bidder {
 		bidLevels.put(LOW, lowBids);
 	}
 	
+
+	public int getCompletingBid(int possiblePoints,int currentPoints) {
+		return possiblePoints - currentPoints ;
+	}
+	
 	public int getBidAmount(Status gameStatus, Character targetCharacter, int spentSoFar, int rackSize) {
 		int scoreToWin = (int) (getBidBase(targetCharacter, spentSoFar, rackSize) * getBidMultiplier(targetCharacter));
 		int scoreToLose = (int) (0.66 *  gameStatus.getMaxExpectedBid(targetCharacter));

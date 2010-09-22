@@ -110,6 +110,7 @@ public class G4Player implements Player {
 
 	@Override
 	public String returnWord() {
+		gameStatus.resetGame();
 		checkIfWeWon(history.get(history.size()-1));
 		return getBestWord();
 	}

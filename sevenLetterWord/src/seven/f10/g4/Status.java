@@ -13,7 +13,7 @@ public class Status {
 
 	private Integer game=0;
 	private Integer turn=0;
-	private HashMap<Character, Integer> winningBids = new HashMap<Character, Integer>(); //what was the winning bid on each letter
+	private HashMap<Integer, Integer> winningBids = new HashMap<Integer, Integer>(); //what was the winning bid on each letter
 	private HashMap<Integer, Integer> scoreSoFar = new HashMap<Integer, Integer>(); //(id, score)
 	private ArrayList<Opponent> opponentList = new ArrayList<Opponent>();
 	
@@ -48,6 +48,9 @@ public class Status {
 		}
 	}
 	
+	
+	
+	
 	public int getGame() {
 		return game;
 	}
@@ -56,10 +59,9 @@ public class Status {
 		return turn;
 	}
 	
-	
-	private void resetGame() {
+	public void resetGame() {
 		turn = 0;
-		winningBids = new HashMap<Character, Integer>(); //what was the winning bid on each letter
+		winningBids = new HashMap<Integer, Integer>(); //what was the winning bid on each letter
 		scoreSoFar = new HashMap<Integer, Integer>(); //(id, score)
 		resetOpponents();
 	}
@@ -98,6 +100,7 @@ public class Status {
 	public Integer opponentSpend(Opponent o) {
 		return o.getSpend();
 	}
+	
 	public Integer winningBid(Letter l) {
 		return winningBids.get(l.getAlphabet());
 	}

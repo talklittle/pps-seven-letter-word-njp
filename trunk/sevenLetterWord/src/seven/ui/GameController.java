@@ -28,7 +28,7 @@ public class GameController {
         GameResult gameresult = new GameResult(0, new ArrayList<Integer>());
         int retValue=0;
         // Now we do the program logic stuff
-        
+        log.error("Letters done: " + gc_local.num_leters_done);
         if(gc_local.isMoreBiddingLeft() == true)
         {
             Letter bidLetter = gc_local.ScrabbleObject.getRandomFromBag();
@@ -40,7 +40,7 @@ public class GameController {
             	long start = System.currentTimeMillis();
                 Player currPlayer = gc_local.PObjectList.get(loop);
                 log.info("Requesting bid from player " + loop + " (" + currPlayer.getClass().getName() + ")");
-                int bidValue = currPlayer.Bid(bidLetter,gc_local.BidList,gc_local.number_of_rounds,gc_local.PlayerList,gc_local.secretstateList.get(loop),loop);
+                int bidValue = currPlayer.Bid((Letter) bidLetter.clone(),gc_local.BidList,gc_local.number_of_rounds,gc_local.PlayerList,gc_local.secretstateList.get(loop),loop);
                 // If player is full makes his value = 0.
                 if(bidValue < 0)
                 {
@@ -78,6 +78,7 @@ public class GameController {
         }
         else
         {
+        	System.out.println("Ending round");
             // Before we do the clearance work, let us get the words
             gc_local.PlayerWords.clear();
             for(int loop=0;loop<gc_local.PObjectList.size();loop++)
@@ -90,10 +91,11 @@ public class GameController {
             // Validate and change scores:
             validateAndScore(gc_local);
 
-
             // Get the word from each, calculate score, store words in history
             // Also make a new wordbag
             gc_local.ScrabbleObject.initBag();
+
+            gc_local.num_leters_done = gc_local.number_of_secret_objects*gc_local.PlayerList.size();
             // Now first clear the open letters
             for(int loop=0;loop<gc_local.PlayerList.size();loop++)
             {

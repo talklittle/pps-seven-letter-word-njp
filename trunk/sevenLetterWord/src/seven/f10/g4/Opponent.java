@@ -41,10 +41,12 @@ public class Opponent {
 	public void updateBid(PlayerBids lastBid) {
 		Letter a = lastBid.getTargetLetter();
 		bidHistory[Util.getIndexFromChar(a.getAlphabet())] = lastBid.getBidvalues().get(getID()); 
+		expectedBids.put(a.getAlphabet(), lastBid.getBidvalues().get(id));
 		if (getID() == lastBid.getWinnerID()) {
 			int winningAmount = lastBid.getWinAmmount(); //is this reflecting the vickery auction? (is this second best?
 			updateSpend(winningAmount);
 			updateRack(a);
+			expectedBids = Util.createAlphabetToIntMap();
 		}
 		
 		

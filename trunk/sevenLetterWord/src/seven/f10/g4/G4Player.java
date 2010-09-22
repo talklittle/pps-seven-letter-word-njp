@@ -73,7 +73,7 @@ public class G4Player implements Player {
 				
 			}
 			
-			return bidder.getBidAmount(bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
+			return bidder.getBidAmount(gameStatus, bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
 			
 		} else {
 			checkIfWeWon(history.get(history.size() - 1));
@@ -84,7 +84,7 @@ public class G4Player implements Player {
 
 				}
 			}
-			return bidder.getBidAmount(bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
+			return bidder.getBidAmount(gameStatus, bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
 		}
 	}
 

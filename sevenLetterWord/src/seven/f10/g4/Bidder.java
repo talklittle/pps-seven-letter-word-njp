@@ -47,12 +47,7 @@ public class Bidder {
 	
 	public int getBidAmount(Status gameStatus, Character targetCharacter, int spentSoFar, int rackSize) {
 		int scoreToWin = (int) (getBidBase(gameStatus, targetCharacter, spentSoFar, rackSize) * getBidMultiplier(targetCharacter));
-		int scoreToLose = (int) (0.66 *  gameStatus.getMaxExpectedBid(targetCharacter));
-		if(scoreToWin < scoreToLose) {
-			System.out.println("We are bidding to make the others lose! "+scoreToLose+" instead of "+scoreToWin);
-			return scoreToLose;
-		}
-		else return scoreToWin;
+		return scoreToWin;
 	}
 	
 	private int getBidBase(Status gameStatus, Character targetCharacter, int spentSoFar, int rackSize) {

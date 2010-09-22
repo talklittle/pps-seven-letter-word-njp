@@ -78,28 +78,48 @@ public class G4Player implements Player {
 			
 			return bidder.getBidAmount(gameStatus, bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
 			
-		} else {
+		} 
+		else {
+			int score;
 			if(history.size()>0) checkIfWeWon(history.get(history.size() - 1));
 			if (wordInRack.getLength() >= 6) {
 				int possiblePoints = sevenLetterWordPossible(bidLetter);
 				if (possiblePoints > 0) {
+					System.err.println("We are using Neetha's strategy");
 					System.err.println("check ");
 					Word word=new Word(getBestWord());
-					return bidder.getCompletingBid(possiblePoints,word.getPoints() );
+					score = bidder.getCompletingBid(possiblePoints,word.getPoints() );
+					
 					//bid high on this one.
 				}
-				if(wordInRack.getLength()>=8){
-					return 1; //  stop bidding when we have more than 8 letter and no 7 letter word.
+				else if(wordInRack.getLength()>=8){
+					System.err.println("We went into Flavio's restriction");
+					score = 1 ; //  stop bidding when we have more than 8 letter and no 7 letter word.
 				}
+				else{
+					if(wordInRack.getLength()>=7){
+						if (sevenLetterWordExists(wordInRack)) {
+							System.err.println("found seven letter word");
+							score = 1; // I already have a seven letter word and bid low.
+						}
+					}	
+					System.err.println("We are using Nitin standard with more than 6 letters");
+					score = bidder.getBidAmount(gameStatus, bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
+				}
+
 			}
-			if(wordInRack.getLength()>=7){
-			if (sevenLetterWordExists(wordInRack)) {
-				System.err.println("found seven letter word");
-				return 1; // I already have a seven letter word and bid low.
+			else{
+				System.err.println("We are using Nitin standard");
+				score = bidder.getBidAmount(gameStatus, bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
 			}
+			int scoreToLose = (int) (0.66 *  gameStatus.getMaxExpectedBid(bidLetter.getAlphabet()));
+			if(score < scoreToLose) {
+				System.out.println("We are bidding to make the others lose! "+scoreToLose+" instead of "+score);
+				return scoreToLose;
 			}
-			return bidder.getBidAmount(gameStatus, bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
+			return score;
 		}
+
 	}
 
 	private void checkIfWeWon(PlayerBids lastBid) {
@@ -183,7 +203,6 @@ public class G4Player implements Player {
 	}
 	
 	private int sevenLetterWordPossible(Letter addedLetter) {
-		System.err.println("checking possibility");
 		ArrayList<Letter> modifiedRack = new ArrayList(rack);
 		modifiedRack.add(addedLetter);
 		Word newWord = createWordFromLettersOnRack(modifiedRack);

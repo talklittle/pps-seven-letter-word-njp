@@ -26,16 +26,8 @@ public class Opponent {
 		spendSoFar += spend;
 	}
 	
-	public void resetSpend() {
-		spendSoFar = 0;
-	}
-	
 	public int getSpend(){
 		return spendSoFar;
-	}
-	
-	public void resetRack() {
-		rack.clear();
 	}
 	
 	public void updateBid(PlayerBids lastBid) {
@@ -79,6 +71,13 @@ public class Opponent {
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
+	}
+
+	public void reset(){
+		rack.clear();
+		spendSoFar = 0;
+		bidHistory = new Integer[26];
+		expectedBids = Util.createAlphabetToIntMap();
 	}
 
 }

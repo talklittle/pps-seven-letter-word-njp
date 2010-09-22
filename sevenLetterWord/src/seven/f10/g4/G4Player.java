@@ -76,12 +76,17 @@ public class G4Player implements Player {
 			return bidder.getBidAmount(gameStatus, bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
 			
 		} else {
-			checkIfWeWon(history.get(history.size() - 1));
+			if(history.size()>0) checkIfWeWon(history.get(history.size() - 1));
 			if (wordInRack.getLength() >= 7) {
-				if (sevenLetterWordExists()) {
+				if (sevenLetterWordExists(wordInRack)) {
 					System.err.println("found seven letter word");
 					return 1; // I already have a seven letter word and bid low.
-
+				} 
+				int possiblePoints = sevenLetterWordPossible(bidLetter);
+				if (possiblePoints > 0) {
+					Word word=new Word(getBestWord());
+					return bidder.getCompletingBid(possiblePoints,word.getPoints() );
+					//bid high on this one.
 				}
 			}
 			return bidder.getBidAmount(gameStatus, bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
@@ -103,6 +108,10 @@ public class G4Player implements Player {
 	@Override
 	public String returnWord() {
 		checkIfWeWon(history.get(history.size()-1));
+		return getBestWord();
+	}
+
+	private String getBestWord() {
 		String bestString = "";
 		boolean foundSevenLetterWord = false;
 		ArrayList<Word> sevenLetterWordsSeen = new ArrayList<Word>();
@@ -151,7 +160,7 @@ public class G4Player implements Player {
 		return bestSevenLetterWord;
 	}
 
-	private boolean sevenLetterWordExists() {
+	private boolean sevenLetterWordExists(Word rackWord) {
 		for (Word dictWord : dictionary) {
 			if(dictWord.getLength()==7){
 				if (wordInRack.isInDictionary(dictWord)) {
@@ -161,6 +170,16 @@ public class G4Player implements Player {
 			}
 		}
 		return false;
-
+	}
+	
+	private int sevenLetterWordPossible(Letter addedLetter) {
+		ArrayList<Letter> modifiedRack = new ArrayList(rack);
+		modifiedRack.add(addedLetter);
+		Word newWord = createWordFromLettersOnRack(modifiedRack);
+		if(sevenLetterWordExists(newWord)) {
+			System.err.println("Completing Bid : " + newWord + newWord.getPoints());
+			return newWord.getPoints() + 50;
+		}
+		return 0;
 	}
 }

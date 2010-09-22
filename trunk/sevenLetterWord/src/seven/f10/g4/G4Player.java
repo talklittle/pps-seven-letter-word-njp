@@ -85,36 +85,36 @@ public class G4Player implements Player {
 			if (wordInRack.getLength() >= 6) {
 				int possiblePoints = sevenLetterWordPossible(bidLetter);
 				if (possiblePoints > 0) {
-					System.err.println("We are using Neetha's strategy");
-					System.err.println("check ");
+					//System.err.println("We are using Neetha's strategy");
+					//System.err.println("check ");
 					Word word=new Word(getBestWord());
 					score = bidder.getCompletingBid(possiblePoints,word.getPoints() );
 					
 					//bid high on this one.
 				}
-				else if(wordInRack.getLength()>=8){
-					System.err.println("We went into Flavio's restriction");
-					score = 1 ; //  stop bidding when we have more than 8 letter and no 7 letter word.
-				}
+				//else if(wordInRack.getLength()>=8){
+				//	System.err.println("We went into Flavio's restriction");
+				//	score = 1 ; //  stop bidding when we have more than 8 letter and no 7 letter word.
+				//}
 				else{
 					if(wordInRack.getLength()>=7){
 						if (sevenLetterWordExists(wordInRack)) {
-							System.err.println("found seven letter word");
+							//System.err.println("found seven letter word");
 							score = 1; // I already have a seven letter word and bid low.
 						}
 					}	
-					System.err.println("We are using Nitin standard with more than 6 letters");
+					//System.err.println("We are using Nitin standard with more than 6 letters");
 					score = bidder.getBidAmount(gameStatus, bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
 				}
 
 			}
 			else{
-				System.err.println("We are using Nitin standard");
+				//System.err.println("We are using Nitin standard");
 				score = bidder.getBidAmount(gameStatus, bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
 			}
 			int scoreToLose = (int) (0.66 *  gameStatus.getMaxExpectedBid(bidLetter.getAlphabet()));
 			if(score < scoreToLose) {
-				System.out.println("We are bidding to make the others lose! "+scoreToLose+" instead of "+score);
+				//System.out.println("We are bidding to make the others lose! "+scoreToLose+" instead of "+score);
 				return scoreToLose;
 			}
 			return score;
@@ -194,7 +194,7 @@ public class G4Player implements Player {
 		for (Word dictWord : dictionary) {
 			if(dictWord.getLength()==7){
 				if (wordInRack.isInDictionary(dictWord)) {
-					System.err.println("seven letter word is "+wordInRack.getWord()+" "+dictWord.getWord());
+					//System.err.println("seven letter word is "+wordInRack.getWord()+" "+dictWord.getWord());
 					return true;
 				}
 			}
@@ -207,7 +207,7 @@ public class G4Player implements Player {
 		modifiedRack.add(addedLetter);
 		Word newWord = createWordFromLettersOnRack(modifiedRack);
 		if(sevenLetterWordExists(newWord)) {
-			System.err.println("Completing Bid : " +newWord.getPoints());
+			//System.err.println("Completing Bid : " +newWord.getPoints());
 			return newWord.getPoints();
 		}
 		return 0;

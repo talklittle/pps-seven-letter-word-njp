@@ -39,10 +39,6 @@ public class Status {
 
 	public void updateTurnAndGame(PlayerBids lastBid) {
 		turn++;
-		if(turn == 8*opponentList.size()) {
-			game++;
-			turn = 0;
-		}
 		Letter a = lastBid.getTargetLetter();
 		addOpponentToList(lastBid.getWinnerID());
 		for(int i = 0; i < opponentList.size(); i++) {
@@ -62,8 +58,9 @@ public class Status {
 		return turn;
 	}
 	
-	public void resetGame() {
+	public void newGame() {
 		turn = 0;
+		game++;
 		//scoreSoFar = new HashMap<Integer, Integer>(); //(id, score)
 		resetOpponents();
 	}

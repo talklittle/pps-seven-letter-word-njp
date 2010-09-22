@@ -28,7 +28,7 @@ public class GameController {
         GameResult gameresult = new GameResult(0, new ArrayList<Integer>());
         int retValue=0;
         // Now we do the program logic stuff
-        log.error("Letters done: " + gc_local.num_leters_done);
+        log.trace("Letters done: " + gc_local.num_leters_done);
         if(gc_local.isMoreBiddingLeft() == true)
         {
             Letter bidLetter = gc_local.ScrabbleObject.getRandomFromBag();
@@ -39,7 +39,7 @@ public class GameController {
             {
             	long start = System.currentTimeMillis();
                 Player currPlayer = gc_local.PObjectList.get(loop);
-                //log.info("Requesting bid from player " + loop + " (" + currPlayer.getClass().getName() + ")");
+                log.info("Requesting bid from player " + loop + " (" + currPlayer.getClass().getName() + ")");
                 int bidValue = currPlayer.Bid((Letter) bidLetter.clone(),gc_local.BidList,gc_local.number_of_rounds,gc_local.PlayerList,gc_local.secretstateList.get(loop),loop);
                 // If player is full makes his value = 0.
                 if(bidValue < 0)

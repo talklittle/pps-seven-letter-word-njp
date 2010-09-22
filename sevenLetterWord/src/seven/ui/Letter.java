@@ -9,8 +9,12 @@ package seven.ui;
  *
  * @author Satyajeet
  */
-public class Letter {
+public class Letter implements Cloneable{
 
+	protected Object clone(){
+		Letter l = new Letter(alphabet,value);
+		return l;
+	}
     Character alphabet;
     int value;
     public Letter(Character c, int s)

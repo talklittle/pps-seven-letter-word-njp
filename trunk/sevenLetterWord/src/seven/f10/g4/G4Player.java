@@ -147,7 +147,12 @@ public class G4Player implements Player {
 	public String returnWord() {
 		gameStatus.newGame();
 		checkIfWeWon(history.get(history.size()-1));
-		return getBestWord();
+		String returnMe = getBestWord();
+		
+		// reset the rack
+		rack = new ArrayList<Letter>();
+		
+		return returnMe;
 	}
 
 	private String getBestWord() {

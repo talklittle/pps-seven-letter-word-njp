@@ -12,18 +12,9 @@ public class Status {
 
 	private Integer game=0;
 	private Integer turn=0;
-	private Integer noOfPlayers=0;
 	private HashMap<Integer, Integer> winningBids = new HashMap<Integer, Integer>(); //what was the winning bid on each letter
 	private HashMap<Integer, Integer> scoreSoFar = new HashMap<Integer, Integer>(); //(id, score)
 	private ArrayList<Opponent> opponentList = new ArrayList<Opponent>();
-	
-	public Integer getNoOfPlayers() {
-		return noOfPlayers;
-	}
-
-	public void setNoOfPlayers(Integer noOfPlayers) {
-		this.noOfPlayers = noOfPlayers;
-	}
 
 	public ArrayList<Opponent> getOpponentList() {
 		return opponentList;
@@ -37,7 +28,7 @@ public class Status {
 
 	public void updateTurnAndGame(PlayerBids lastBid) {
 		turn++;
-		if(turn == 8*noOfPlayers) {
+		if(turn == 8*opponentList.size()) {
 			game++;
 			turn = 0;
 		}

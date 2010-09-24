@@ -19,10 +19,14 @@ public class Status {
 	private HashMap<Integer, Integer> scoreSoFar = new HashMap<Integer, Integer>(); //(id, score)
 	private ArrayList<Opponent> opponentList = new ArrayList<Opponent>();
 	
+
+	public static int[] remainingFrequency = Util.letterFrequency;
+	
 	private Logger logger = Logger.getLogger(Status.class);
 	
 	public Status(G4Player g4Player) {
 		ourPlayer = g4Player;
+		
 	}
 
 	public void initOpponents(List<?> PlayerList) {
@@ -44,15 +48,13 @@ public class Status {
 	public void updateTurnAndGame(PlayerBids lastBid) {
 		turn++;
 		Letter a = lastBid.getTargetLetter();
+		remainingFrequency[a.getAlphabet() - 'A']--; //update the number of remaining letters.
 		addOpponentToList(lastBid.getWinnerID());
 		for(int i = 0; i < opponentList.size(); i++) {
 			Opponent o = opponentList.get(i);
 			o.updateBid(lastBid);
 		}
 	}
-	
-	
-	
 	
 	public int getGame() {
 		return game;
@@ -76,6 +78,7 @@ public class Status {
 			Opponent o = it.next();
 			o.reset();
 		}
+		remainingFrequency = Util.letterFrequency;
 	}
 
 	public void updateScore(Opponent o, int value) {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
@@ -20,8 +21,6 @@ public class Status {
 	private ArrayList<Opponent> opponentList = new ArrayList<Opponent>();
 	
 
-	public static int[] remainingFrequency = Util.letterFrequency;
-	
 	private Logger logger = Logger.getLogger(Status.class);
 	
 	public Status(G4Player g4Player) {
@@ -48,7 +47,6 @@ public class Status {
 	public void updateTurnAndGame(PlayerBids lastBid) {
 		turn++;
 		Letter a = lastBid.getTargetLetter();
-		remainingFrequency[a.getAlphabet() - 'A']--; //update the number of remaining letters.
 		addOpponentToList(lastBid.getWinnerID());
 		for(int i = 0; i < opponentList.size(); i++) {
 			Opponent o = opponentList.get(i);
@@ -78,7 +76,6 @@ public class Status {
 			Opponent o = it.next();
 			o.reset();
 		}
-		remainingFrequency = Util.letterFrequency;
 	}
 
 	public void updateScore(Opponent o, int value) {
@@ -127,6 +124,26 @@ public class Status {
 			}
 		}
 		return numInBag;
+	}
+	
+	public String getRemainingBagString() {
+		TreeMap<Character, Integer> freqRemaining = new TreeMap<Character, Integer>();
+		String returnMe = "";
+		
+		for (char alpha : Util.alphabet) {
+			freqRemaining.put(alpha, ScrabbleValues.getLetterFrequency(alpha));
+		}
+		for (Opponent o : opponentList) {
+			List<Letter> rack = o.getRack();
+			for (Letter letter : rack) {
+				freqRemaining.put(letter.getAlphabet(), freqRemaining.get(letter.getAlphabet()) - 1);
+			}
+		}
+		for (Character c : freqRemaining.keySet()) {
+			if (freqRemaining.get(c) > 0)
+				returnMe += c;
+		}
+		return returnMe;
 	}
 
 	public int getMaxExpectedBid(Character targetCharacter) {

@@ -53,8 +53,9 @@ public class Bidder {
 	private int getBidBase(Status gameStatus, Character targetCharacter, int spentSoFar, int rackSize) {
 		int remainingInBag = Math.max(1, gameStatus.getRemainingBag(targetCharacter));
 		int numTiles = 8 * gameStatus.getOpponentList().size();
+		int averageSevenScore = getAverageSevenScore(targetCharacter, gameStatus);
 		if (rackSize < 7)
-			return (ASSUMED_WORD_SCORE - spentSoFar) / Math.max(2, (7 - rackSize));
+			return (getAverageSevenScore(targetCharacter, gameStatus) - spentSoFar) / Math.max(2, (7 - rackSize));
 		return (ASSUMED_WORD_SCORE - spentSoFar) / (2); // temp fix to make sure our bidding does not stop before getting a 7 letter word.
 	}
 
@@ -67,6 +68,15 @@ public class Bidder {
 			return MID_BID;
 		}
 		return LOW_BID;
+	}
+	
+	private int getAverageSevenScore(Character targetCharacter, Status gameStatus) {
+		int sumSevenScore = 0;
+		int numSevenLetterWords = 0;
+		
+		
+		
+		return ASSUMED_WORD_SCORE;
 	}
 
 	public void setNumberOfSevenLetterWords(int numberOfSevenLetterWords) {

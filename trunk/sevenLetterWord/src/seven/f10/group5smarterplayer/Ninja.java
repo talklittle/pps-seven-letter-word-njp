@@ -309,5 +309,12 @@ public class Ninja implements Player {
 
     	return bestword;
     }
+
+
+	@Override
+	public void updateScores(ArrayList<Integer> scores) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

@@ -6,13 +6,20 @@ import java.util.HashMap;
 public class SevenLetterWordHelper {
 	private ArrayList<Word> sevenLetterDictionary=new ArrayList<Word>();
 	private HashMap<Character,Integer> frequencyMap=new HashMap<Character, Integer>();
+	
+	private Status gameStatus;
+	
+	
+	public void setStatus(Status status) {
+		gameStatus = status;
+	}
 	public void setSevenLetterDictionary(ArrayList<Word> sevenLetterWords){
 		this.sevenLetterDictionary=sevenLetterWords;
 	}
 	public ArrayList<Word> getSevenLetterDictionary(){
 		return sevenLetterDictionary;
 	}
-	public ArrayList<Word> getSevenLetterWords(Word wordFromRack){
+	public ArrayList<Word> getSevenLetterWords(Word wordFromRack, Status gameStatus){
 		frequencyMap=new HashMap<Character, Integer>();
 		ArrayList<Word> sevenLetterWords=new ArrayList<Word>();
 		for(Word sevenLetterWord: sevenLetterDictionary){
@@ -21,6 +28,7 @@ public class SevenLetterWordHelper {
 				updateLetterFrequency(sevenLetterWord);
 			}
 		}
+		sevenLetterWords = removeUnreachableWords(sevenLetterWords, gameStatus);
 		return sevenLetterWords;
 	}
 	private void updateLetterFrequency(Word word){
@@ -33,6 +41,31 @@ public class SevenLetterWordHelper {
 			}
 		}
 	}
+	
+	
+	private ArrayList<Word> removeUnreachableWords(ArrayList<Word> currentWords, Status gameStatus) {
+		
+		ArrayList<Word> prunedWords = new ArrayList<Word>();
+		int remaining = 0;
+		if(gameStatus == null)
+			return currentWords;
+		for(int i = 0; i < Util.alphabet.length; i++ ) {
+			if(remaining > 0 ) {
+				for(Word w : currentWords) {
+					remaining = gameStatus.getRemainingBag(Util.alphabet[i]);
+					String s="";
+					s+=Util.alphabet[i];
+					if(w.getWord().contains(s) && !prunedWords.contains(w)) {
+						prunedWords.add(w);
+					}
+				}
+			}
+		}
+		if(prunedWords.size() == 0 ) 
+			prunedWords = currentWords;
+		return prunedWords;
+	}
+	
 	public HashMap<Character,Integer> getFrequencyMap(){
 		return frequencyMap;
 	}

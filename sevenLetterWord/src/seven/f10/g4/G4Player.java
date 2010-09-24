@@ -83,7 +83,7 @@ public class G4Player implements Player {
 			wordInRack = createWordFromLettersOnRack(rack);
 			sevenLetterWordHelper.setSevenLetterDictionary(allSevenLetterWords);
 			possibleSevenLetterWords = sevenLetterWordHelper
-					.getSevenLetterWords(wordInRack);
+					.getSevenLetterWords(wordInRack, gameStatus);
 			bidder.setNumberOfSevenLetterWords(possibleSevenLetterWords.size());
 			bidder.setFrequencyMap(sevenLetterWordHelper.getFrequencyMap());
 			if (history.size() > 0) {
@@ -143,7 +143,7 @@ public class G4Player implements Player {
 			rack.add(lastBid.getTargetLetter());
 			wordInRack = createWordFromLettersOnRack(rack);
 			possibleSevenLetterWords = sevenLetterWordHelper
-					.getSevenLetterWords(wordInRack);
+					.getSevenLetterWords(wordInRack, gameStatus);
 			bidder.setNumberOfSevenLetterWords(possibleSevenLetterWords.size());
 		}
 	}

@@ -32,7 +32,11 @@ import seven.ui.SecretState;
  *
  */
 public class g4Player implements Player {
-	
+	@Override
+	public void updateScores(ArrayList<Integer> scores) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	public g4Player()
 	{

@@ -173,4 +173,9 @@ public class G5_MostPossible implements Player {
 		numberLettersRemaining.put('Y', ScrabbleParameters.getCount('Y'));
 		numberLettersRemaining.put('Z', ScrabbleParameters.getCount('Z'));
 	}
+	@Override
+	public void updateScores(ArrayList<Integer> scores) {
+		// TODO Auto-generated method stub
+		
+	}
 }

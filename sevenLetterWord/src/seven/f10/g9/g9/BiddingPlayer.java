@@ -425,5 +425,11 @@ public class BiddingPlayer implements Player {
 
 		return null;
 	}
+
+	@Override
+	public void updateScores(ArrayList<Integer> scores) {
+		// TODO Auto-generated method stub
+		
+	}
 }
 

@@ -20,7 +20,11 @@ import seven.ui.PlayerBids;
 import seven.ui.SecretState;
 
 public class SimplePlayer implements seven.ui.Player {
-
+	@Override
+	public void updateScores(ArrayList<Integer> scores) {
+		// TODO Auto-generated method stub
+		
+	}
 	KnowledgeBase kb;
 	HashMap<Character, Integer> myLetters = new HashMap<Character, Integer>();
 	protected int totalLetters = 0;

@@ -96,4 +96,10 @@ public class OutlinePlayer implements Player {
 		return bestword.word;
 	}
 
+	@Override
+	public void updateScores(ArrayList<Integer> scores) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

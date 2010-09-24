@@ -4,7 +4,7 @@ import java.util.HashMap;
 import seven.ui.Scrabble;
 
 public class Word {
-	public static final double PARTIAL_PERCENTAGE=.50;
+	public static final double PARTIAL_PERCENTAGE=.5;
 	private Integer points;
 	private String word;
 	private Integer length;

@@ -10,7 +10,7 @@ public class Bidder {
 	private static final float HIGH_BID = 0.90f;
 	private static final float MID_BID = 0.60f;
 	private static final float LOW_BID = 0.40f;
-	private static final int ASSUMED_WORD_SCORE = 60;
+	private static final int ASSUMED_WORD_SCORE = 50;
 	
 	private SevenLetterWordHelper sevenLetterWordHelper;
 	private int numberOfSevenLetterWords;

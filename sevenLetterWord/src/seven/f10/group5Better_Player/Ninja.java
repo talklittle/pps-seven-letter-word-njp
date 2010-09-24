@@ -319,5 +319,12 @@ public class Ninja implements Player {
 	}
 
 
+	@Override
+	public void updateScores(ArrayList<Integer> scores) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 	
 }

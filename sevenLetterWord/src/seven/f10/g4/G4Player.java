@@ -14,6 +14,11 @@ import seven.ui.PlayerBids;
 import seven.ui.SecretState;
 
 public class G4Player implements Player {
+	@Override
+	public void updateScores(ArrayList<Integer> scores) {
+		// TODO Auto-generated method stub
+		
+	}
 	private static ArrayList<Word> dictionary;
 	private ArrayList<Letter> rack = new ArrayList<Letter>();
 	private SevenLetterWordHelper sevenLetterWordHelper = new SevenLetterWordHelper();

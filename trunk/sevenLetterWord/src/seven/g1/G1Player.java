@@ -828,5 +828,10 @@ public class G1Player implements Player{
 			return (int) ( loss * timefactor);
 		}
     }
+	@Override
+	public void updateScores(ArrayList<Integer> scores) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

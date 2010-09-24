@@ -17,7 +17,11 @@ import seven.ui.PlayerBids;
 import seven.ui.SecretState;
 
 public class OldPlayer1 implements Player {
-
+	@Override
+	public void updateScores(ArrayList<Integer> scores) {
+		// TODO Auto-generated method stub
+		
+	}
 	/** Config params etc **/
 	private int maxRandomIncrementForBid = 1;
 	private int minLettersToHaveToBidAggressively = 3;

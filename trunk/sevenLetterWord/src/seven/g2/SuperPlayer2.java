@@ -22,7 +22,11 @@ import seven.ui.PlayerBids;
 import seven.ui.SecretState;
 
 public class SuperPlayer2 implements Player {
-
+	@Override
+	public void updateScores(ArrayList<Integer> scores) {
+		// TODO Auto-generated method stub
+		
+	}
 	private int noOfWords = 54833;
 
 	/** Config params etc **/

@@ -54,7 +54,7 @@ public class Bidder {
 		int remainingInBag = Math.max(1, gameStatus.getRemainingBag(targetCharacter));
 		int numTiles = 8 * gameStatus.getOpponentList().size();
 		if (rackSize < 7)
-			return (ASSUMED_WORD_SCORE - spentSoFar) / (7 - rackSize);
+			return (ASSUMED_WORD_SCORE - spentSoFar) / Math.max(2, (7 - rackSize));
 		return (ASSUMED_WORD_SCORE - spentSoFar) / (2); // temp fix to make sure our bidding does not stop before getting a 7 letter word.
 	}
 

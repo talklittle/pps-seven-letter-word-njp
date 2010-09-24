@@ -9,13 +9,13 @@ import seven.ui.Player;
 import seven.ui.PlayerBids;
 import seven.ui.SecretState;
 
-public class StingyPlayer implements Player {
+public class LessStingyPlayer implements Player {
+
 	@Override
 	public void updateScores(ArrayList<Integer> scores) {
 		// TODO Auto-generated method stub
 		
 	}
-
 	static final Word[] wordlist;
 
 	static {
@@ -60,7 +60,7 @@ public class StingyPlayer implements Player {
 			}
 		}
 
-		return 0;
+		return r.nextInt(3);
 	}
 
 	private void checkBid(PlayerBids b) {

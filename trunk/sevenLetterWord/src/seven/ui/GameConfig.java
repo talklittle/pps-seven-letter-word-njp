@@ -5,6 +5,7 @@
 
 package seven.ui;
 
+import java.io.FileWriter;
 import java.util.ArrayList;
 
 /**
@@ -21,14 +22,25 @@ public class GameConfig {
 	ArrayList<Player> PObjectList;
 	ArrayList<String> PlayerWords;
 	ArrayList<Integer> lasPoints;
+	ArrayList<Integer> lasPointsSpent;
 	Scrabble ScrabbleObject;
 
 	int gameDelay = 500;
 	int number_of_rounds;
 	int current_round;
-	public int num_leters_done = 0;
+	public int num_leters_done;
+	public FileWriter outFile = null;
 	ArrayList<String> wordbag;
 
+	public String getPlayersPlaying()
+	{
+		String ret = "";
+		for(String s : PlayerList)
+		{
+			ret += s.replace("seven.", "")+" ";
+		}
+		return ret;
+	}
 	public GameConfig(ArrayList<String> plist, int secret_objs,
 			IOController ioc, int numRounds) {
 
@@ -38,15 +50,19 @@ public class GameConfig {
 		ScrabbleObject = new Scrabble();
 		BidList = new ArrayList<PlayerBids>();
 		PlayerWords = new ArrayList<String>();
+		lasPointsSpent = new ArrayList<Integer>();
 		PObjectList = new ArrayList<Player>();
 		lasPoints = new ArrayList<Integer>();
 		PlayerList = plist;
 		number_of_secret_objects = secret_objs;
 		current_round = 0;
 		number_of_rounds = numRounds;
+		num_leters_done = secret_objs*plist.size();
 		
 		for (int loop = 0; loop < PlayerList.size(); loop++) {
 			Player ptemp = ioc.getPObject(PlayerList.get(loop));
+
+			ptemp.Register();
 			PObjectList.add(ptemp);
 		}
 
@@ -69,14 +85,13 @@ public class GameConfig {
 			for (int wordloop = 0; wordloop < number_of_secret_objects; wordloop++) {
 				Letter temp_letter = ScrabbleObject.getRandomFromBag();
 				currSS.secretLetters.add(temp_letter);
-				num_leters_done++;
 			}
 		}
 
 	}
 
 	public boolean isMoreBiddingLeft() {
-
+		
 		return num_leters_done < 8*PlayerList.size();
 	}
 

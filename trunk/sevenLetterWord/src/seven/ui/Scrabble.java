@@ -215,7 +215,7 @@ public class Scrabble {
     	if (null != sowpods) return;
         sowpods = new Dictionary();
         try{
-            CSVReader csvreader = new CSVReader(new FileReader("SOWPODS.txt"));
+            CSVReader csvreader = new CSVReader(new FileReader("sowpods.txt"));
             String[] nextLine;
             csvreader.readNext(); // Waste the first line
             while((nextLine = csvreader.readNext()) != null)

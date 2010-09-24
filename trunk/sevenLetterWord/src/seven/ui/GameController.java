@@ -20,7 +20,7 @@ public class GameController {
     ArrayList<Boolean> isplayerdone;
     private Logger log = Logger.getLogger(GameController.class);
 
-
+    private ArrayList<Integer> pointsSpent = new ArrayList<Integer>();
     // If gameover this function will return a (-1)
     public GameResult GamePlay(GameConfig gc_local)
     {
@@ -29,6 +29,14 @@ public class GameController {
         int retValue=0;
         // Now we do the program logic stuff
         log.trace("Letters done: " + gc_local.num_leters_done);
+        
+        if(pointsSpent.size() == 0)
+        {
+        	for(int loop=0;loop<gc_local.PObjectList.size();loop++)
+        	{
+        		pointsSpent.add(0);
+        	}
+        }
         if(gc_local.isMoreBiddingLeft() == true)
         {
             Letter bidLetter = gc_local.ScrabbleObject.getRandomFromBag();
@@ -46,7 +54,7 @@ public class GameController {
                 {
                     bidValue = 0;
                 }
-
+                
 //                if(isPlayerDone(loop, gc_local))
 //                {
                     // The winner also needs to have a FALSE value for this field to get thru.
@@ -78,6 +86,8 @@ public class GameController {
         }
         else
         {
+        	gc_local.lasPointsSpent = pointsSpent;
+        	pointsSpent = new ArrayList<Integer>();
         	System.out.println("Ending round");
             // Before we do the clearance work, let us get the words
             gc_local.PlayerWords.clear();
@@ -86,7 +96,6 @@ public class GameController {
                 Player currP = gc_local.PObjectList.get(loop);
                 String word = currP.returnWord();
                 gc_local.PlayerWords.add(word);
-
             }
             // Validate and change scores:
             validateAndScore(gc_local);
@@ -118,6 +127,16 @@ public class GameController {
 
                 }
 
+            }
+            ArrayList<Integer> finalScores = new ArrayList<Integer>();
+            for(int loop=0;loop<gc_local.PObjectList.size();loop++)
+            {
+            	finalScores.add(gc_local.secretstateList.get(loop).getScore());
+            }
+            for(int loop=0;loop<gc_local.PObjectList.size();loop++)
+            {
+                Player currP = gc_local.PObjectList.get(loop);
+                currP.updateScores((ArrayList<Integer>) finalScores.clone());
             }
 
 
@@ -160,6 +179,7 @@ public class GameController {
     {
         gc_local.wordbag.clear();
         gc_local.lasPoints.clear();
+        
         // For every word in the list, validate and score
         for(int loop=0;loop<gc_local.PlayerWords.size();loop++)
         {
@@ -300,6 +320,8 @@ public class GameController {
         lastBid.winnerID = winnerIndex;
         lastBid.winAmmount = lastBid.bidvalues.get(runnerUpIndex);
 
+        pointsSpent.set(winnerIndex, pointsSpent.get(winnerIndex) + lastBid.winAmmount);
+        
         SecretState winnerSS = gc_local.secretstateList.get(winnerIndex);
         int secretCount = winnerSS.secretLetters.size();
         OpenState winnerOS = gc_local.openstateList.get(winnerIndex);

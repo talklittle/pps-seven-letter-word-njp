@@ -3,6 +3,7 @@ package seven.ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -46,13 +47,17 @@ public class GameEngine extends javax.swing.JFrame {
     /** Creates new form GameEngine */
     public static javax.swing.Timer memUpdate;
     private Logger logger = Logger.getLogger(GameEngine.class);
+	private Object outFile;
 
     static {
 		PropertyConfigurator.configure("logger.properties");
     }
-    public GameEngine() {
-        initComponents();
-        myInit();
+    public GameEngine(String string) {
+    	if(!string.equals("text"))
+    	{
+	        initComponents();
+	        myInit();
+    	}
     }
 
         private static class GameRunner implements Runnable
@@ -60,24 +65,63 @@ public class GameEngine extends javax.swing.JFrame {
 
         public void run() {
             try {
+            	int this_round = 0;
                 Boolean play = true;
                 int score;
+                String header = gameconfig.getPlayersPlaying()+","+gameconfig.number_of_secret_objects+","+gameconfig.number_of_rounds+",";
                 while(play == true)
                 {
                     score = gamecontroller.GamePlay(gameconfig).retValue;
-                    thisGameEngine.updateUI();
+                    if(gameconfig.outFile != null)
+                    {
+                    	if(gameconfig.current_round != this_round)
+            			//format "PlayerList,NumSecret,NumRounds,round_number,player,word,points_won,points_spent,score"
+                    	try {
+                    		this_round = gameconfig.current_round;
+                    		for(int i =0;i<gameconfig.PlayerList.size();i++)
+                    		{
+    							gameconfig.outFile.write(header);
+    							gameconfig.outFile.write(gameconfig.current_round+",");
+    							gameconfig.outFile.write(gameconfig.PlayerList.get(i).replace("seven.", "")+",");
+    							gameconfig.outFile.write(""+i+",");
+
+    							gameconfig.outFile.write((gameconfig.PlayerWords.get(i)== null ? "" : gameconfig.PlayerWords.get(i))+",");
+    							gameconfig.outFile.write(gameconfig.lasPoints.get(i)+",");
+    							gameconfig.outFile.write(gameconfig.lasPointsSpent.get(i)+",");
+    							gameconfig.outFile.write(""+gameconfig.secretstateList.get(i).score);
+    							gameconfig.outFile.write("\n");
+                    		}
+							gameconfig.outFile.flush();
+
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+                    }
+                    else
+                    	thisGameEngine.updateUI();
                 if(score ==-1)
                 {
                     // Game must have ended, since you have a score now
                    play = false;
                    String gameover = "Game Over.";
-                   JOptionPane.showMessageDialog(GameScreen, gameover);
+                   if(gameconfig.outFile == null)
+                	   JOptionPane.showMessageDialog(GameScreen, gameover);
                 }
 
                 // Update user interface!
 
                 Thread.sleep(gameconfig.gameDelay);
 
+                }
+                if(gameconfig.outFile != null)
+                {
+                	try {
+                		gameconfig.outFile.close();
+            		} catch (IOException e) {
+            			// TODO Auto-generated catch block
+            			e.printStackTrace();
+            		}
                 }
             } catch (InterruptedException ex) {
                 System.out.println("Game runner interrupted");
@@ -426,9 +470,9 @@ public class GameEngine extends javax.swing.JFrame {
         int secret_objs = Integer.parseInt((String)secretBox.getSelectedItem());
 
 
-
+        iocontroller = new IOController();
         gameconfig = new GameConfig(plist, secret_objs, iocontroller,numR);
-        updateUI();
+        
     }//GEN-LAST:event_NewGameButtonActionPerformed
 
     private void GameDelaySliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_GameDelaySliderStateChanged
@@ -478,61 +522,7 @@ public class GameEngine extends javax.swing.JFrame {
     }//GEN-LAST:event_StepButtonActionPerformed
 
     private void TournamentButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TournamentButtonActionPerformed
-        // TODO add your handling code here:
-        int number_of_games = 10;
-        String filename = JOptionPane.showInputDialog(null, "Enter Filename!");
-        ArrayList<GameResult> gameresults = new ArrayList<GameResult>();
-
-        for(int loop1=0;loop1<number_of_games;loop1++)
-        {
-            gamecontroller = new GameController();
-            // Lets create the playerstate object
-            DefaultListModel dlm = (DefaultListModel) PlayerListbox.getModel();
-            ArrayList<String> plist = new ArrayList<String>();
-            for(int loop=0;loop<dlm.getSize();loop++)
-            {
-                plist.add((String)dlm.get(loop));
-            }
-            int numR = Integer.parseInt((String)RoundsBox.getSelectedItem());
-            int secret_objs = Integer.parseInt((String)secretBox.getSelectedItem());
-
-            int returnValue = 0;
-
-            gameconfig = new GameConfig(plist, secret_objs, iocontroller,numR);
-            GameResult gameresult;
-            do{
-                gameresult = gamecontroller.GamePlay(gameconfig);
-                returnValue = gameresult.retValue;
-            }while(returnValue != -1);
-
-
-
-            // Now we are done, so save the gameresult
-
-            gameresults.add(gameresult);
-        }
-        try{
-         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filename));
-         for(int loop=0;loop<gameresults.size();loop++)
-         {
-             String output = "";
-             bufferedWriter.write(Integer.toString(loop));
-             for(int loop2=0;loop2<gameresults.get(loop).scoreList.size();loop2++)
-             {
-                 output += "," + gameresults.get(loop).scoreList.get(loop2).toString();
-             }
-             System.out.println(output);
-             bufferedWriter.write(output);
-             bufferedWriter.newLine();
-         }
-
-        bufferedWriter.close();
-        }catch(Exception ex)
-        {
-            System.out.println("Could not write tournament output");
-        }
-
-        System.out.println("Tournament done!");
+       
     }//GEN-LAST:event_TournamentButtonActionPerformed
 
     /**
@@ -544,15 +534,57 @@ public class GameEngine extends javax.swing.JFrame {
 					@Override
 					public void write(int b) throws IOException {						
 					}
-				})); 
+				}));
+    	if(args.length == 0 || args.length == 1 && args[0] == "gui")
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new GameEngine().setVisible(true);
+                new GameEngine("gui").setVisible(true);
             }
         });
+    	else if(args.length == 4)
+    		new GameEngine("text").runText(args);
+    	else
+    		System.err.println("Usage: java GameEngine \"<player class list with spaces between each>\" num_secret num_rounds out_file_name");
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private void runText(String[] args) {
+    	String players[] = args[0].split(" ");
+    	int numSecret = Integer.valueOf(args[1]);
+    	int numRounds = Integer.valueOf(args[2]);
+    	iocontroller = new IOController();
+    	FileWriter outFile = null;
+    	try {
+    		File f = new File(args[3]);
+    		if(!f.exists())
+    		{
+    			f.createNewFile();
+    			outFile = new FileWriter(f);
+    			outFile.write("PlayerList,NumSecret,NumRounds,round_number,player,playerid,word,points_won,points_spent,score\n");
+    			outFile.flush();
+    		}
+    		else
+    			outFile = new FileWriter(f,true);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	gamecontroller = new GameController();
+        // Lets create the playerstate object
+        ArrayList<String> plist = new ArrayList<String>();
+        for(String s : players)
+    	{
+        	plist.add(s);
+    	}
+        gameconfig = new GameConfig(plist, numSecret, iocontroller,numRounds);
+        gameconfig.gameDelay = 0;
+        gameconfig.outFile = outFile;
+
+        grunner = new Thread(new GameRunner());
+        grunner.start();
+        
+	}
+
+	// Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton AddPlayerButton;
     private javax.swing.JSlider GameDelaySlider;
     private javax.swing.JLabel LetterLabel;

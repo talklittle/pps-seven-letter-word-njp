@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import seven.ui.Letter;
 import seven.ui.PlayerBids;
 import seven.ui.ScrabbleValues;
@@ -16,6 +18,8 @@ public class Status {
 	private Integer turn=0;
 	private HashMap<Integer, Integer> scoreSoFar = new HashMap<Integer, Integer>(); //(id, score)
 	private ArrayList<Opponent> opponentList = new ArrayList<Opponent>();
+	
+	private Logger logger = Logger.getLogger(Status.class);
 	
 	public Status(G4Player g4Player) {
 		ourPlayer = g4Player;
@@ -63,6 +67,7 @@ public class Status {
 		game++;
 		//scoreSoFar = new HashMap<Integer, Integer>(); //(id, score)
 		resetOpponents();
+		logger.debug("Status: reset turn = 0, game is now "+game);
 	}
 	
 	private void resetOpponents(){

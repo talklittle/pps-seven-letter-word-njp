@@ -64,29 +64,6 @@ public class SevenLetterWordHelper {
 				keepWords.add(w);
 			}
 		}
-		
-//		for(int i = 0; i < Util.alphabet.length; i++ ) {
-//			int remainingInRack = 0;
-//			for (Letter letter : rack) {
-//				if (Util.alphabet[i] == letter.getAlphabet())
-//					remainingInRack++; 
-//			}
-//			remaining = gameStatus.getRemainingBag(Util.alphabet[i]) + remainingInRack;
-//			
-//			if(remaining == 0 ) {
-//				for(Word w : currentWords) {
-//					String s="";
-//					s+=Util.alphabet[i];
-//					if (
-//					if(w.getWord().contains(s) && !prunedWords.contains(w)) {
-//						prunedWords.add(w);
-//					}
-//				}
-//			}
-//		}
-//		if(prunedWords.size() == 0 ) 
-//			prunedWords = currentWords;
-//		logger.debug("prunedWords.size="+prunedWords.size() + " currentWords.size="+currentWords.size());
 		logger.debug("keepWords.size="+keepWords.size() + " currentWords.size="+currentWords.size());
 		return keepWords;
 	}

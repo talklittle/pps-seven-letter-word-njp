@@ -96,29 +96,24 @@ public class G4Player implements Player {
 		else {
 			if(history.size()>0) checkIfWeWon(history.get(history.size() - 1));
 			if (wordInRack.getLength() >= 6) {
-				int possiblePoints = sevenLetterWordPossible(bidLetter);
+				int possiblePoints = possibleSevenLetterScore(bidLetter);
 				if (possiblePoints > 0) {
 					logger.debug("We are using Neetha's strategy");
-					Word word=new Word(getBestWord());
+					Word word=getBestWord(wordInRack);
 					score = bidder.getCompletingBid(possiblePoints,word.getPoints() );
-					
-					//bid high on this one.
+					logger.debug("Possible points" + possiblePoints + "current points : " + word.getPoints() + "current word " + word.getWord() + "Thus bid amount is " + score);
 				}
-				//else if(wordInRack.getLength()>=8){
-				//	logger.debug("We went into Flavio's restriction");
-				//	score = 1 ; //  stop bidding when we have more than 8 letter and no 7 letter word.
-				//}
 				else{
 					if(wordInRack.getLength()>=7){
-						if (sevenLetterWordExists(wordInRack)) {
+						if (findSevenLetterWord(wordInRack) != null) {
 							logger.debug("found seven letter word");
 							score = 1; // I already have a seven letter word and bid low.
 						}
 					}	
 					logger.debug("We are using Nitin standard with more than 6 letters");
+					logger.debug("current rack : " + wordInRack.getWord() + "current Points" + getBestWord(wordInRack).getPoints());
 					score = bidder.getBidAmount(gameStatus, bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
 				}
-
 			}
 			else{
 				logger.debug("We are using Nitin standard");
@@ -152,21 +147,21 @@ public class G4Player implements Player {
 	public String returnWord() {
 		gameStatus.newGame();
 		checkIfWeWon(history.get(history.size()-1));
-		String returnMe = getBestWord();
+		Word returnMe = getBestWord(wordInRack);
 		
 		// reset the rack
 		rack = new ArrayList<Letter>();
 		
-		return returnMe;
+		return returnMe.getWord();
 	}
 
-	private String getBestWord() {
+	private Word getBestWord(Word currentRack) {
 		String bestString = "";
 		boolean foundSevenLetterWord = false;
 		ArrayList<Word> sevenLetterWordsSeen = new ArrayList<Word>();
 		int maxScore = -1;
 		for (Word dictionaryWord : dictionary) {
-			if (wordInRack.isInDictionary(dictionaryWord)) {
+			if (currentRack.isInDictionary(dictionaryWord)) {
 				if (dictionaryWord.getLength() == 7) {
 					foundSevenLetterWord = true;
 					sevenLetterWordsSeen.add(dictionaryWord);
@@ -178,9 +173,9 @@ public class G4Player implements Player {
 			}
 		}
 		if (!foundSevenLetterWord)
-			return bestString;
+			return new Word(bestString);
 		else
-			return getBestSevenLetterWord(sevenLetterWordsSeen);
+			return new Word(getBestSevenLetterWord(sevenLetterWordsSeen));
 	}
 
 	private Word createWordFromLettersOnRack(ArrayList<Letter> rack) {
@@ -209,6 +204,18 @@ public class G4Player implements Player {
 		return bestSevenLetterWord;
 	}
 
+	private Word findSevenLetterWord(Word rackWord) {
+		for (Word dictWord : dictionary) {
+			if(dictWord.getLength()==7){
+				if (rackWord.isInDictionary(dictWord)) {
+					logger.debug("rack is "+rackWord.getWord()+" possible dictionary Word "+dictWord.getWord());
+					return dictWord;
+				}
+			}
+		}
+		return null;
+	}
+	
 	private boolean sevenLetterWordExists(Word rackWord) {
 		for (Word dictWord : dictionary) {
 			if(dictWord.getLength()==7){
@@ -221,13 +228,15 @@ public class G4Player implements Player {
 		return false;
 	}
 	
-	private int sevenLetterWordPossible(Letter addedLetter) {
-		ArrayList<Letter> modifiedRack = new ArrayList(rack);
-		modifiedRack.add(addedLetter);
-		Word newWord = createWordFromLettersOnRack(modifiedRack);
-		if(sevenLetterWordExists(newWord)) {
-			logger.debug("Completing Bid : " +newWord.getPoints());
-			return newWord.getPoints();
+	private int possibleSevenLetterScore(Letter addedLetter) {
+		logger.debug("The letter for bid is " + addedLetter.getAlphabet());
+		Word newWord = new Word(wordInRack.getWord().concat(addedLetter.getAlphabet().toString()));
+		logger.debug("the rack we will have if we take this letter" + newWord.getWord());
+		Word sevenLetterWord = findSevenLetterWord(newWord);
+		if(sevenLetterWord != null) {
+			logger.debug("original word " + wordInRack.getWord() +  " new Word " + newWord.getWord() + " 7 letter word " + sevenLetterWord.getWord());
+			logger.debug("Completing Bid : " + sevenLetterWord.getPoints() + " word : " + sevenLetterWord.getWord());
+			return sevenLetterWord.getPoints();
 		}
 		return 0;
 	}

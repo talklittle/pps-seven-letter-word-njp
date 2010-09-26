@@ -48,34 +48,19 @@ public class Opponent {
 			updateSpend(winningAmount);
 			updateRack(a);
 			//We need to reduce the expected bid for this player on all letters, and set it to 0 for this letter just won
-			//if he has 1 letter, then reduce each expected bid by 0.85 on all others letters
-			//if 2 letters, 0.7
-			//if 3 letters, 0.55
-			//if 4 letters, 0.40
-			//if 5 letters, 0.25
-			//if 6 letters, 0.10
-			//if 7 letters just set them all to 0
+			//the expected bid on the letter that he just won will be 0
+			//the expected bid on all other letters is reduced by 1/3
+			//if he has 7 letters now, we must assume that he got a 7 letter word and that he will be bidding 0
 			double modifier;
-			//rack size has to be larger than 0, because he just won
-			if(rack.size() == 1)
-				modifier = 0.85;
-			else if(rack.size() == 2)
-				modifier = 0.70;
-			else if(rack.size() == 3)
-				modifier = 0.55;
-			else if(rack.size() == 4)
-				modifier = 0.40;
-			else if(rack.size() == 5)
-				modifier = 0.25;
-			else if(rack.size() == 6)
-				modifier = 0.10;
-			else modifier = 0;
+			if(rack.size() == 7)
+				modifier = 0;
+			else modifier = 0.67;//every letter reduce by 1/3
 			for (int i = 0; i < Util.alphabet.length; i++) {
 				Character c = new Character(Util.alphabet[i]);
 				int oldVal = expectedBids.get(c);
-				expectedBids.put(c, (int) (modifier * oldVal));
+				expectedBids.put(c, (int) (modifier * oldVal)); //all letters exp bids reduced by 1/3
 			}
-			expectedBids.put(a.getAlphabet(), 0);
+			expectedBids.put(a.getAlphabet(), 0);//the that he just won set to 0
 		}
 		logger.debug("Player: "+id+", letter: "+a.getAlphabet()+", win:"+lastBid.getWinnerID()+" expected bids: "+expectedBids);
 	}

@@ -140,6 +140,7 @@ public class G4Player implements Player {
 			possibleSevenLetterWords = sevenLetterWordHelper
 					.getSevenLetterWords(wordInRack, gameStatus);
 			bidder.setNumberOfSevenLetterWords(possibleSevenLetterWords.size());
+			setCurrentRack();
 		}
 	}
 
@@ -239,5 +240,9 @@ public class G4Player implements Player {
 			return sevenLetterWord.getPoints();
 		}
 		return 0;
+	}
+	
+	public void setCurrentRack() {
+		Util.setWordInRack(wordInRack);
 	}
 }

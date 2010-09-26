@@ -38,6 +38,7 @@ public class SevenLetterWordHelper {
 		sevenLetterWords = removeUnreachableWords(sevenLetterWords, gameStatus, wordFromRack);
 		return sevenLetterWords;
 	}
+	
 	private void updateLetterFrequency(Word word){
 		for(int i=0;i<7;i++){
 			if(frequencyMap.get(word.getWord().charAt(i))==null){

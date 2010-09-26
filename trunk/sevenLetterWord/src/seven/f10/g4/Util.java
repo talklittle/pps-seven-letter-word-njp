@@ -12,6 +12,15 @@ public class Util {
 	
 	public final static char[] alphabet = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 	
+	private static Word wordInRack;
+	
+	public static Word getWordInRack() {
+		return wordInRack;
+	}
+	
+	public static void setWordInRack(Word setMe) {
+		wordInRack = setMe;
+	}
 	/**
 	 * Associates each Character with its array index e.g. a = 0, and z = 25;
 	 */

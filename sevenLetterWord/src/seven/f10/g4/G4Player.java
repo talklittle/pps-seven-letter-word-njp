@@ -79,6 +79,7 @@ public class G4Player implements Player {
 		int score;
 		if (rack.isEmpty()) { // First Bid is about to happen
 			rack.addAll(secretState.getSecretLetters());
+			gameStatus.setNumHiddenLetters(secretState.getSecretLetters().size());
 			id = PlayerID;
 			wordInRack = createWordFromLettersOnRack(rack);
 			sevenLetterWordHelper.setSevenLetterDictionary(allSevenLetterWords);
@@ -125,9 +126,9 @@ public class G4Player implements Player {
 		System.err.println("ScoreToLose "+scoreToLose+" Score "+score + " stl "+stl);
 		if(score < scoreToLose) {
 			System.err.println("We are bidding to make the others lose! "+scoreToLose+" instead of "+score);
-			return scoreToLose;
+			return Math.max(1,scoreToLose);
 		}
-		return score;
+		return Math.max(1,score);
 
 	}
 

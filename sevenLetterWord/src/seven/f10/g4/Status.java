@@ -19,7 +19,8 @@ public class Status {
 	private Integer turn=0;
 	private HashMap<Integer, Integer> scoreSoFar = new HashMap<Integer, Integer>(); //(id, score)
 	private ArrayList<Opponent> opponentList = new ArrayList<Opponent>();
-	
+	private int auctionsRemaining;
+	private int numHiddenLetters;
 
 	private Logger logger = Logger.getLogger(Status.class);
 	
@@ -52,6 +53,7 @@ public class Status {
 			Opponent o = opponentList.get(i);
 			o.updateBid(lastBid);
 		}
+		auctionsRemaining=auctionsRemaining-1;
 	}
 	
 	public int getGame() {
@@ -67,6 +69,7 @@ public class Status {
 		game++;
 		//scoreSoFar = new HashMap<Integer, Integer>(); //(id, score)
 		resetOpponents();
+		auctionsRemaining=opponentList.size()*8-opponentList.size()*numHiddenLetters;
 		logger.debug("Status: reset turn = 0, game is now "+game);
 	}
 	
@@ -157,5 +160,17 @@ public class Status {
 			}
 		}
 		return max;
+	}
+	public void setAuctionsRemaining(int auctionsRemaining) {
+		this.auctionsRemaining = auctionsRemaining;
+	}
+	public int getAuctionsRemaining() {
+		return auctionsRemaining;
+	}
+	public void setNumHiddenLetters(int numHiddenLetters) {
+		this.numHiddenLetters = numHiddenLetters;
+	}
+	public int getNumHiddenLetters() {
+		return numHiddenLetters;
 	}
 }

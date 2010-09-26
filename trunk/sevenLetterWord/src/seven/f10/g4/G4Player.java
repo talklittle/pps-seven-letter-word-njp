@@ -121,7 +121,7 @@ public class G4Player implements Player {
 			}
 		}
 		double stl =   gameStatus.getMaxExpectedBid(bidLetter.getAlphabet());
-		int scoreToLose = (int) (0.66 *  stl );
+		int scoreToLose = (int) (0.67 *  stl ); //we bid 2/3 of the maximum expected bid, we could bid stl -1 to be very aggressive, but it is more risky
 		System.err.println("ScoreToLose "+scoreToLose+" Score "+score + " stl "+stl);
 		if(score < scoreToLose) {
 			System.err.println("We are bidding to make the others lose! "+scoreToLose+" instead of "+score);

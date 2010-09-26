@@ -57,7 +57,7 @@ public class Bidder {
 	
 	private int getBidBase(Status gameStatus, Character targetCharacter, int spentSoFar, int rackSize) {
 		int remainingInBag = Math.max(1, gameStatus.getRemainingBag(targetCharacter));
-		int numTiles = 8 * gameStatus.getOpponentList().size();
+		int numTiles = gameStatus.getAuctionsRemaining();
 		int averageSevenScore = getAverageSevenScore(targetCharacter, gameStatus);
 		if (rackSize < 7)
 			return (getAverageSevenScore(targetCharacter, gameStatus) - spentSoFar) / Math.max(2, (7 - rackSize));

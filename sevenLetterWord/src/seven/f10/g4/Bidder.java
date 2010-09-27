@@ -2,8 +2,11 @@ package seven.f10.g4;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
+
+import seven.ui.Letter;
 
 public class Bidder {
 	private static final String LOW = "LOW";
@@ -13,6 +16,7 @@ public class Bidder {
 	private static final float MID_BID = 0.60f;
 	private static final float LOW_BID = 0.40f;
 	private static final int ASSUMED_WORD_SCORE = 50;
+	private static final Random RANDOM = new Random();
 	
 	private SevenLetterWordHelper sevenLetterWordHelper;
 	private int numberOfSevenLetterWords;
@@ -46,8 +50,14 @@ public class Bidder {
 	}
 
 	
-	public int getCompletingBid(int possiblePoints,int currentPoints) {
-		return possiblePoints - currentPoints ;
+	public int getCompletingBid(int possiblePoints,int currentPoints, Letter bidLetter, Status gameStatus) {
+		int completingBid = possiblePoints - currentPoints;
+		// e.g. if we think 4 are left, randomly bid 1/4, 2/4, 3/4, or 4/4 of completingBid
+		int remainingInBag = gameStatus.getRemainingBag(bidLetter.getAlphabet());
+		if (remainingInBag == 0)
+			remainingInBag = 1;
+		int remainingDivisor = RANDOM.nextInt() % remainingInBag + 1;
+		return completingBid / remainingDivisor;
 	}
 	
 	public int getBidAmount(Status gameStatus, Character targetCharacter, int spentSoFar, int rackSize) {

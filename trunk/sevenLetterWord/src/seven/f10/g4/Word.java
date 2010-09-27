@@ -84,5 +84,8 @@ public class Word {
 		return word;
 	}
 	
+	public int getFrequency(Character c) {
+		return frequency[Util.getIndexFromChar(c)];
+	}
 	
 }

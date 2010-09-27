@@ -65,5 +65,24 @@ public class Word {
 		}
 	}
 	
+	public Character charAt(int j) {
+		return new Character(word.charAt(j));
+	}
+	
+	public int hashCode() {
+		return word.hashCode();
+	}
+	
+	public boolean equals(Object o) {
+		if(o instanceof Word) 
+			if(((Word) o).word.equals(word))
+				return true;
+		return false;
+	}
+	
+	public String toString() {
+		return word;
+	}
+	
 	
 }

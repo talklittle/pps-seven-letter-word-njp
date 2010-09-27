@@ -9,12 +9,13 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 
 import seven.ui.Letter;
+import seven.ui.Player;
 import seven.ui.PlayerBids;
 import seven.ui.ScrabbleValues;
 
 public class Status {
 
-	private G4Player ourPlayer;
+	private Player ourPlayer;
 	private Integer game=0;
 	private Integer turn=0;
 	private HashMap<Integer, Integer> scoreSoFar = new HashMap<Integer, Integer>(); //(id, score)
@@ -24,7 +25,7 @@ public class Status {
 
 	private Logger logger = Logger.getLogger(Status.class);
 	
-	public Status(G4Player g4Player) {
+	public Status(Player g4Player) {
 		ourPlayer = g4Player;
 		
 	}
@@ -154,7 +155,7 @@ public class Status {
 		int max = 0;
 		while (it.hasNext()) {
 			Opponent o = it.next();
-			if(o.getID() != ourPlayer.getId()){
+			if(o.getID() != ((G4Player)ourPlayer).getId()){
 				if (max < o.expectedBids.get(targetCharacter))
 					max = o.expectedBids.get(targetCharacter);
 			}

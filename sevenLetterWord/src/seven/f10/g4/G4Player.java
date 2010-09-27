@@ -105,15 +105,14 @@ public class G4Player implements Player {
 					logger.debug("Possible points" + possiblePoints + "current points : " + word.getPoints() + "current word " + word.getWord() + "Thus bid amount is " + score);
 				}
 				else{
-					if(wordInRack.getLength()>=7){
-						if (findSevenLetterWord(wordInRack) != null) {
-							logger.debug("found seven letter word");
-							score = 1; // I already have a seven letter word and bid low.
-						}
-					}	
-					logger.debug("We are using Nitin standard with more than 6 letters");
-					logger.debug("current rack : " + wordInRack.getWord() + "current Points" + getBestWord(wordInRack).getPoints());
-					score = bidder.getBidAmount(gameStatus, bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
+					if(wordInRack.getLength()>=7 && findSevenLetterWord(wordInRack) != null) {
+						logger.debug("found seven letter word");
+						score = 1; // I already have a seven letter word and bid low.
+					} else {
+						logger.debug("We are using Nitin standard with more than 6 letters");
+						logger.debug("current rack : " + wordInRack.getWord() + "current Points" + getBestWord(wordInRack).getPoints());
+						score = bidder.getBidAmount(gameStatus, bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
+					}
 				}
 			}
 			else{

@@ -101,7 +101,7 @@ public class G4Player implements Player {
 				if (possiblePoints > 0) {
 					logger.debug("We are using Neetha's strategy");
 					Word word=getBestWord(wordInRack);
-					score = bidder.getCompletingBid(possiblePoints,word.getPoints(), bidLetter, gameStatus );
+					score = bidder.getCompletingBid(possiblePoints,word.getPoints() );
 					logger.debug("Possible points" + possiblePoints + "current points : " + word.getPoints() + "current word " + word.getWord() + "Thus bid amount is " + score);
 				}
 				else{

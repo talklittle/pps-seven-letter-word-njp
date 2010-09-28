@@ -87,15 +87,21 @@ public class G4Player implements Player {
 					.getSevenLetterWords(wordInRack, gameStatus);
 			bidder.setNumberOfSevenLetterWords(possibleSevenLetterWords.size());
 			bidder.setFrequencyMap(sevenLetterWordHelper.getFrequencyMap());
-			if (history.size() > 0) {
+			if (history.size() > 0 && gameStatus.getTurn() > 0) {
 				checkIfWeWon(history.get(history.size() - 1));
 				
+			} else {
+				gameStatus.updateTurnAndGame(null);
 			}
 			score = bidder.getBidAmount(gameStatus, bidLetter.getAlphabet(), gameStatus.opponentSpend(id), rack.size());
 			
 		} 
 		else {
-			if(history.size()>0) checkIfWeWon(history.get(history.size() - 1));
+			if(history.size()>0 && gameStatus.getTurn() > 0) {
+				checkIfWeWon(history.get(history.size() - 1));
+			} else {
+				gameStatus.updateTurnAndGame(null);
+			}
 			if (wordInRack.getLength() >= 6) {
 				int possiblePoints = possibleSevenLetterScore(bidLetter);
 				if (possiblePoints > 0) {
@@ -146,12 +152,12 @@ public class G4Player implements Player {
 
 	@Override
 	public String returnWord() {
-		gameStatus.newGame();
 		checkIfWeWon(history.get(history.size()-1));
 		Word returnMe = getBestWord(wordInRack);
 		
 		// reset the rack
 		rack = new ArrayList<Letter>();
+		gameStatus.newGame();
 		
 		return returnMe.getWord();
 	}

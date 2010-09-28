@@ -48,13 +48,16 @@ public class Status {
 
 	public void updateTurnAndGame(PlayerBids lastBid) {
 		turn++;
-		Letter a = lastBid.getTargetLetter();
-		addOpponentToList(lastBid.getWinnerID());
-		for(int i = 0; i < opponentList.size(); i++) {
-			Opponent o = opponentList.get(i);
-			o.updateBid(lastBid);
-		}
 		auctionsRemaining=auctionsRemaining-1;
+
+		if (lastBid != null) {
+			Letter a = lastBid.getTargetLetter();
+			addOpponentToList(lastBid.getWinnerID());
+			for(int i = 0; i < opponentList.size(); i++) {
+				Opponent o = opponentList.get(i);
+				o.updateBid(lastBid);
+			}
+		}
 	}
 	
 	public int getGame() {

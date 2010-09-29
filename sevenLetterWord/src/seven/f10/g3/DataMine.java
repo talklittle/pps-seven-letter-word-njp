@@ -158,7 +158,6 @@ public abstract class DataMine {
                boolean isFinal = (max_itemset_size == roundnum);
                long out_of = (long) roundLists.get(1).size() * (long) prevRound.length;
                long debug_step = out_of / 100;
-               logger.debug("Enumerating " + out_of + " ItemSet combinations");
                long this_set_number = 0;
                //for (ItemSet baseSet : roundLists.get(roundnum - 1)) {
                for (int j = 0; j < prevRound.length; j++) {
@@ -183,15 +182,7 @@ public abstract class DataMine {
                                                        out_of,
                                                        Arrays.deepToString(oldterms),
                                                        newTerm
-                                       };
-                                       logger.debug(String.format("On item %d of %d (%s + %s)",a));
-                                       if (logger.isDebugEnabled()) {
-                                               Runtime r = Runtime.getRuntime();
-                                               long free = r.freeMemory();
-                                               logger.debug("Currently using " +
-                                                               (r.totalMemory() - free) + " bytes(?) -- free " + free
-                                               );
-                                       }
+                                       };                                      
                                }
 
 

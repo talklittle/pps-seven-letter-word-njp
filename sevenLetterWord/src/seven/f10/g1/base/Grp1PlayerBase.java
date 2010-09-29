@@ -8,7 +8,6 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
-import seven.g0.Word;
 import seven.ui.Letter;
 import seven.ui.Player;
 import seven.ui.PlayerBids;
@@ -95,7 +94,11 @@ public abstract class Grp1PlayerBase implements Player {
 		if( PlayerID == winner) {
 			rack.add(letterWon);
 		} else {
-			gameStatus.addToOpponents(winner, letterWon);
+			gameStatus.addToOpponents(winner, letterWon, 0, bids.getWinAmmount(), true);
+		}
+
+		for(int p: bids.getBidvalues()){
+			gameStatus.addToOpponents(1, letterWon, p, 0, false);
 		}
 
 	}
@@ -121,5 +124,12 @@ public abstract class Grp1PlayerBase implements Player {
 		
 		return word;
 	}
+	
+	@Override
+	public void updateScores(ArrayList<Integer> scores) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

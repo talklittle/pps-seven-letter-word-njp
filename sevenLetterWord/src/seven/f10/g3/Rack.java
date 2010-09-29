@@ -34,33 +34,12 @@ public class Rack {
 		return (chars);
 	}
 
-	public char[] getWantedCharArray() {
-
-		char[] chars = new char[r.size()];
-		for (int i = 0; i < r.size(); i++)
-			if (r.get(i).getWant() == true)
-				chars[i] = r.get(i).getL();
-
-		Arrays.sort(chars);
-		return (chars);
-	}
-
 	public void add(RackLetter l) {
 		r.add(l);
 	}
 
 	public int size() {
 		return r.size();
-	}
-
-	public int wantSize() {
-		int size = 0;
-		for (int i = 0; i < r.size(); i++) {
-			if (r.get(i).getWant() == true)
-				size++;
-		}
-
-		return (size);
 	}
 
 	public RackLetter get(int i) {
@@ -74,24 +53,6 @@ public class Rack {
 			str += r.get(i).getL();
 
 		return (str);
-	}
-
-	/** Sets the want value to true of all letters in our high word */
-	public void resetWants(String highWord) {
-
-		for (int i = 0; i < r.size(); i++) {
-			r.get(i).setWant(false);
-		}
-
-		char[] c = highWord.toCharArray();
-		for (int k = 0; k < c.length; k++) {
-			for (int i = 0; i < r.size(); i++) {
-				if (c[k] == r.get(i).getL() && r.get(i).getWant() == false) {
-					r.get(i).setWant(true);
-					i = r.size();
-				}
-			}
-		}
 	}
 	
 	public void clear(){

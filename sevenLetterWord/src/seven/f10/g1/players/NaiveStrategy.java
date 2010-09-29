@@ -138,13 +138,13 @@ public class NaiveStrategy extends Strategy {
 		case 'I':
 		case 'N':
 		case 'E':
-			return bids[0];
+			return 2;
 		case 'H':
 		case 'O':
 		case 'D':
-			return bids[1];
+			return 1;
 		default:
-			return bids[2];
+			return 0;
 		}
 	}
 

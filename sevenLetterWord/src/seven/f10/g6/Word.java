@@ -21,6 +21,8 @@ public class Word {
 			index -= Integer.valueOf('A');
 			countKeep[index]++;
 		}
+		if (length == 7)
+			score += 50;
 	}
 
 	public Word(final int[] counts) {

@@ -1,11 +1,11 @@
 package seven.f10.g3;
 
+/**Represents a letter on our rack*/
 public class RackLetter {
 	
-	public RackLetter(char c, Boolean w){
+	public RackLetter(char c){
 		
 		this.l = c;
-		this.want = w;
 	}
 	
 	public char getL() {
@@ -15,13 +15,6 @@ public class RackLetter {
 	public void setL(char l) {
 		this.l = l;
 	}
-	public Boolean getWant() {
-		return want;
-	}
-	public void setWant(Boolean want) {
-		this.want = want;
-	}
 
-	private Boolean want;
 	private char l;
 }

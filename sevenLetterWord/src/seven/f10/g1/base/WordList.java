@@ -2,12 +2,14 @@ package seven.f10.g1.base;
 
 import java.util.ArrayList;
 
-import seven.g0.Word;
 
 public class WordList {
 	ArrayList<Word> wordList;
-	public WordList(ArrayList<Word> words){
-		wordList = words;
+	public WordList(){
+	}
+	
+	public WordList(ArrayList<Word> wtmp){
+		wordList = wtmp;
 	}
 	
 	public String getOptimalWord(Rack r){

@@ -19,13 +19,13 @@ package seven.f10.g9;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Scanner;
 
 import org.apache.log4j.Logger;
 
-import seven.g0.Word;
 import seven.ui.Letter;
 import seven.ui.Player;
 import seven.ui.PlayerBids;
@@ -34,11 +34,7 @@ import seven.ui.SecretState;
 public class BiddingPlayer implements Player {
 	// create the logger object
 	protected Logger l = Logger.getLogger(this.getClass());
-	@Override
-	public void updateScores(ArrayList<Integer> scores) {
-		// TODO Auto-generated method stub
-		
-	}
+
 	// used to track the frequency of letters in 7-letter words
 	static final int[] gameLetters = new int[] { 9, 2, 2, 4, 12, 2, 3, 2, 9, 1,
 			1, 4, 2, 6, 8, 2, 1, 6, 4, 6, 4, 2, 2, 1, 2, 1 };
@@ -47,15 +43,22 @@ public class BiddingPlayer implements Player {
 	static ArrayList<LinkedList<String>> sevenLetterDoubles = new ArrayList<LinkedList<String>>(26);
 	static ArrayList<LinkedList<String>> sevenLetterTriples = new ArrayList<LinkedList<String>>(26);
 	static ArrayList<LinkedList<String>> sevenLetterQuads = new ArrayList<LinkedList<String>>(26);
-
-	private final int POINT_THRESHOLD = 57;
-	private static LinkedList<String> allWords = new LinkedList<String>();
+	static final char[] blacklist = {'J', 'Q', 'V', 'W', 'X', 'Z'};
+	static final int POINT_THRESHOLD = 57;
+	static final int DEFLATOR = 15;
+	static final int IMPROVEMENT_BID = 5;
+	static LinkedList<String> allWords = new LinkedList<String>();
+	
 	private LinkedList<String> remainingWords = new LinkedList<String>();
 	private int beginScore;
+	private int totalBids;
+	private int currentBid;
+	private ArrayList<Character> allLetters;
+	private Word currentBestWord;
+	private int minBid;
+	private boolean bidOn = true;
 
-	// //////////////////////////////
 	static ArrayList<Word> smallWordList;
-	// //////////////////////////////
 
 	// borrowed from Jon Bell's stingyplayer, used to determine the best word
 	// given a hand of letters
@@ -63,8 +66,6 @@ public class BiddingPlayer implements Player {
 	ArrayList<Character> currentLetters;
 	private int ourID;
 	private ArrayList<PlayerBids> cachedBids;
-	
-	ArrayList<Character> allLetters;
 
 	static {
 
@@ -105,9 +106,7 @@ public class BiddingPlayer implements Player {
 			while (wordListScanner.hasNextLine()) {
 				String word = wordListScanner.nextLine();
 
-				// //////////////////////////////
 				smallWordList.add(new Word(word));
-				// //////////////////////////////
 
 				wordList[wordCount] = new Word(word);
 				wordCount++;
@@ -148,17 +147,9 @@ public class BiddingPlayer implements Player {
 				}
 			}
 
-			// for (int z = 0; z < 26; z++) {
-			// System.err.print("\n" + alphabet.charAt(z));
-			// System.err.print("\t" + sevenLetterSingles.get(z).size());
-			// if (sevenLetterDoubles.get(z) != null)
-			// System.err.print("\t" + sevenLetterDoubles.get(z).size());
-			// if (sevenLetterTriples.get(z) != null)
-			// System.err.print("\t" + sevenLetterTriples.get(z).size());
-			// if (sevenLetterQuads.get(z) != null)
-			// System.err.print("\t" + sevenLetterQuads.get(z).size());
-			// }
-		} catch (FileNotFoundException e) {
+			Collections.sort(smallWordList);
+		} 
+		catch (FileNotFoundException e) {
 			// does nothing...
 		}
 	}
@@ -167,6 +158,9 @@ public class BiddingPlayer implements Player {
 		// does nothing so far...
 	}
 
+	/**
+	 * Returns a numeric bid for a letter.
+	 */
 	public int Bid(Letter bidLetter, ArrayList<PlayerBids> PlayerBidList,
 			int total_rounds, ArrayList<String> PlayerList,
 			SecretState secretstate, int PlayerID)
@@ -177,68 +171,148 @@ public class BiddingPlayer implements Player {
 			ourID = PlayerID;
 		}
 
+		// called at the beginning of the round
 		if (currentLetters == null)
 		{
-			remainingWords = allWords;
-			beginScore = secretstate.getScore();
-			currentLetters = new ArrayList<Character>();
-			allLetters = new ArrayList<Character>();
-			ArrayList<Letter> letters = secretstate.getSecretLetters();
-			
-			if (letters.size() > 0)
-			{
-				remainingWords = sevenLetterSingles.get(letters.get(0).getAlphabet() - 65);
-				currentLetters.add(letters.get(0).getAlphabet());
-				allLetters.add(letters.get(0).getAlphabet());
-				for (int i = 1; i < letters.size(); i++)
-				{
-					remainingWords = calcPotentialWords(letters.get(i).getAlphabet());
-					currentLetters.add(letters.get(i).getAlphabet());
-					allLetters.add(letters.get(i).getAlphabet());
-				}
-			}
+			initiateFirstBidInRound(PlayerList, secretstate);
 		}
 		else if (cachedBids.size() > 0)
 		{
+			// check to see if we won the last letter
 			checkBid(cachedBids.get(cachedBids.size() - 1));
 		}
 
-		if (currentLetters.size() > 6)
-		{
-			return 0;
-		}
-		else if(calcBestWord(allLetters).length == 7) //use that function here
-		{
-			return 0;
-		}
-
-		int maxBid = (int) ((double) (POINT_THRESHOLD - beginScore + secretstate.getScore()) / (double) (7 - currentLetters.size()));
+		// are we too slow?
+		long now = System.currentTimeMillis();
+		
+		currentBid++;
+		
+		int maxBid=0;
+		if(currentLetters.size() > 6)
+			maxBid = minBid;
+		else
+			maxBid = (int) ((double) (POINT_THRESHOLD - beginScore + secretstate.getScore()) / (double) (7 - currentLetters.size()));
+		
+		if(maxBid > DEFLATOR && currentBid < (2.0/3.0) * (double)totalBids)
+			maxBid = DEFLATOR;
+		
 		char currentLetter = bidLetter.getAlphabet();
-
-		int potentialWords = calcPotentialWords(currentLetter).size();
-
-		if (currentLetters.size() > 5 && potentialWords > 0)
+		LinkedList<String> potentialWords = calcPotentialWords(currentLetter);
+		
+		if(allLetters.size() > 4)
 		{
-			l.trace("potential: " + calcPotentialWords(currentLetter).get(0));
-			return maxBid;
-		} 
-		else if (potentialWords == 0) 
-		{
-			// l.error("0 possible words");
-			return 0;
-		}
+			ArrayList<Character> potentialLetters = new ArrayList<Character>(allLetters);
+			potentialLetters.add(currentLetter);
+			Word potentialBestWord = calcBestWord(potentialLetters);
+			
+			if(currentBestWord == null)
+				currentBestWord = calcBestWord(allLetters);
+			
+			// if we've found a better 7-letter word than what we have, bet the difference between these 2 words 
+			if (currentBestWord.length == 7)
+			{
+				if(currentBestWord.score < potentialBestWord.score)
+				{
+					l.trace("better word: " + potentialBestWord.word + ": " + potentialBestWord.score + " vs " + currentBestWord.score);
+					return Math.max(potentialBestWord.score - currentBestWord.score, minBid);
+				}
+				
+				bidOn = false;
+				return minBid;
+			}
+			else if(potentialBestWord.length == 7)
+			{
+				l.trace("potential: " + potentialBestWord.word);
+				return maxBid;
+			}
+			// if the next letter opens up the number of potential 7-letter words, bid for it!
+			else if(potentialWords.size() == 0) 
+			{
+				bidOn = false;
+				
+				LinkedList<String> curAvailableWords = findAvailableWords(allLetters);
+				LinkedList<String> potAvailableWords = findAvailableWords(potentialLetters);
 
-		int rank = 1;
-		for (int i = 0; i < sevenLetterSingles.size(); i++) {
-			if (calcPotentialWords((char) (i + 65)).size() > potentialWords) {
-				rank++;
+				if(curAvailableWords.size() < potAvailableWords.size())
+				{
+					return IMPROVEMENT_BID;
+				}
+				
+				return minBid;
 			}
 		}
+		
+		l.trace("time first half: " + (System.currentTimeMillis() - now));
 
-		int bid = (int) ((double) maxBid * ((double) (27 - rank) / 26.0));
+		int potentialScore = calcPotentialScore(currentLetter);
+
+		int rank = 1;
+		int maxScore = potentialScore;
+		for (char c = 'A'; c < 'Z' + 1; c++) {
+			int curScore = calcPotentialScore(c);
+			if (curScore > potentialScore) {
+				rank++;
+			}
+			if(curScore > maxScore)
+				maxScore = curScore;
+		}
+		
+		l.trace("time second half: " + (System.currentTimeMillis() - now ));
+
+		int bid = (int) ((double) maxBid * ((double)potentialScore / (double)maxScore));
+		
+		if(rank > 18 || bid <= minBid)
+		{
+			bidOn = false;
+			return minBid;
+		}
+		
 		return bid;
 	}
 
+	/**
+	 * Sets up bidding parameters at the beginning of a round.
+	 * @param PlayerList
+	 * @param secretstate
+	 */
+	private void initiateFirstBidInRound(ArrayList<String> PlayerList, SecretState secretstate) 
+	{
+		minBid = 0;
+		if(PlayerList.size() < 4)
+			minBid = 3;
+		ArrayList<Letter> letters = secretstate.getSecretLetters();
+		totalBids = PlayerList.size() * ( 8 - letters.size() );
+		currentBid = 0;
+		remainingWords = allWords;
+		beginScore = secretstate.getScore();
+		currentLetters = new ArrayList<Character>();
+		allLetters = new ArrayList<Character>();
+		currentBestWord = null;
+		
+		if (letters.size() > 0)
+		{
+			for (int i = 0; i < letters.size(); i++)
+			{
+				boolean blacklisted = false;
+				for(int j=0; j<blacklist.length; j++)
+				{
+					if(letters.get(i).getAlphabet() == blacklist[j])
+						blacklisted = true;
+				}
+				
+				if(!blacklisted)
+				{
+					remainingWords = calcPotentialWords(letters.get(i).getAlphabet());
+					currentLetters.add(letters.get(i).getAlphabet());
+				}
+				allLetters.add(letters.get(i).getAlphabet());
+			}
+		}
+	}
+
+	/**
+	 * Finds the best possible word given our hand of letters.
+	 */
 	public String returnWord()
 	{
 		checkBid(cachedBids.get(cachedBids.size() - 1));
@@ -249,16 +323,26 @@ public class BiddingPlayer implements Player {
 		return bestword.word;
 	}
 	
+	/**
+	 * Given an ArrayList of characters (a potential hand), returns the best possible word.
+	 * @param letters
+	 * @return the best word possible
+	 */
 	private Word calcBestWord(ArrayList<Character> letters)
 	{
 		char c[] = new char[letters.size()];
 		for (int i = 0; i < c.length; i++) {
 			c[i] = letters.get(i);
 		}
+		
 		String s = new String(c);
 		Word ourletters = new Word(s);
 		Word bestword = new Word("");
-		for (Word w : smallWordList) {
+		
+		for (int i=smallWordList.size()-1; i>0; i--) {
+			Word w = smallWordList.get(i);
+			if(w.length == 6 && bestword.length == 7)
+				break;
 			if (ourletters.contains(w))
 			{
 				if (w.length == 7 && w.score < 50)
@@ -274,17 +358,30 @@ public class BiddingPlayer implements Player {
 		return bestword;
 	}
 
+	/**
+	 * If we were the winner of the previous bid, we perform actions on the letter we just won.
+	 * @param b
+	 */
 	private void checkBid(PlayerBids b) {
 		if (ourID == b.getWinnerID()) {
 			allLetters.add(b.getTargetLetter().getAlphabet());
-			if (currentLetters.size() < 7 && b.getWinAmmount() > 0) {
-				remainingWords = calcPotentialWords(b.getTargetLetter()
-						.getAlphabet());
+			if (currentLetters.size() < 7 && bidOn == true) {
+				remainingWords = calcPotentialWords(b.getTargetLetter().getAlphabet());
 				currentLetters.add(b.getTargetLetter().getAlphabet());
 			}
+			if(allLetters.size() > 4)
+				currentBestWord = calcBestWord(allLetters);
 		}
+		bidOn = true;
 	}
 
+	/**
+	 * Finds the intersection of two LinkedLists of Strings, determining the words that are found 
+	 * in both lists.
+	 * @param list1
+	 * @param list2
+	 * @return
+	 */
 	private LinkedList<String> intersect(LinkedList<String> list1, LinkedList<String> list2) 
 	{
 		LinkedList<String> newList = new LinkedList<String>();
@@ -329,6 +426,11 @@ public class BiddingPlayer implements Player {
 		return newList;
 	}
 
+	/**
+	 * Returns how many of a single given letter are in our hand.
+	 * @param letter the letter we want to count in our hand
+	 * @return the number of given letters in our hand
+	 */
 	private int numCopies(char letter)
 	{
 		int copies = 0;
@@ -341,6 +443,11 @@ public class BiddingPlayer implements Player {
 		return copies;
 	}
 
+	/**
+	 * Creates a list of all the 7-letter words that are possible (with current hand) given a new character.
+	 * @param letter
+	 * @return a linkedlist of all the potential words
+	 */
 	private LinkedList<String> calcPotentialWords(char letter)
 	{
 		int copies = numCopies(letter);
@@ -349,18 +456,15 @@ public class BiddingPlayer implements Player {
 
 		if (copies == 0)
 		{
-			temp = intersect(remainingWords,
-					sevenLetterSingles.get(letter - 65));
+			temp = intersect(remainingWords, sevenLetterSingles.get(letter - 65));
 		}
 		else if (copies == 1 && sevenLetterDoubles.get(letter - 65) != null)
 		{
-			temp = intersect(remainingWords,
-					sevenLetterDoubles.get(letter - 65));
+			temp = intersect(remainingWords, sevenLetterDoubles.get(letter - 65));
 		}
 		else if (copies == 2 && sevenLetterTriples.get(letter - 65) != null)
 		{
-			temp = intersect(remainingWords,
-					sevenLetterTriples.get(letter - 65));
+			temp = intersect(remainingWords, sevenLetterTriples.get(letter - 65));
 		}
 		else if (copies == 3 && sevenLetterQuads.get(letter - 65) != null)
 		{
@@ -368,5 +472,159 @@ public class BiddingPlayer implements Player {
 		}
 
 		return temp;
+	}
+	
+	/**
+	 * 
+	 * @param letter
+	 * @return
+	 */
+	private int calcPotentialScore(char letter)
+	{
+		int copies = numCopies(letter);
+
+		int score = 0;
+
+		if (copies == 0)
+		{
+			score = countIntersect(remainingWords, sevenLetterSingles.get(letter - 65));
+		}
+		else if (copies == 1 && sevenLetterDoubles.get(letter - 65) != null)
+		{
+			score = countIntersect(remainingWords, sevenLetterDoubles.get(letter - 65));
+		}
+		else if (copies == 2 && sevenLetterTriples.get(letter - 65) != null)
+		{
+			score = countIntersect(remainingWords, sevenLetterTriples.get(letter - 65));
+		}
+		else if (copies == 3 && sevenLetterQuads.get(letter - 65) != null)
+		{
+			score = countIntersect(remainingWords, sevenLetterQuads.get(letter - 65));
+		}
+
+		return score;
+	}
+	
+	/**
+	 * Like intersect(), but counts the score of each available 7-letter word instead of creating
+	 * a list with each new word. 
+	 * @param list1
+	 * @param list2
+	 * @return
+	 */
+	private int countIntersect(LinkedList<String> list1, LinkedList<String> list2) 
+	{
+		int total = 0;
+		
+		ListIterator<String> itr1 = (ListIterator<String>) list1.iterator();
+		ListIterator<String> itr2 = (ListIterator<String>) list2.iterator();
+
+		if (itr1.hasNext() && itr2.hasNext())
+		{
+			String s1 = itr1.next();
+			String s2 = itr2.next();
+			boolean done = false;
+			while (!done) {
+				int compResult = s1.compareTo(s2);
+				if (compResult == 0) {
+					Word w = new Word(s1);
+					total += w.score;
+
+					if (itr1.hasNext() && itr2.hasNext())
+					{
+						s1 = itr1.next();
+						s2 = itr2.next();
+					} 
+					else
+					{
+						done = true;
+					}
+				}
+				else if (compResult < 0 && itr1.hasNext()) 
+				{
+					s1 = itr1.next();
+				}
+				else if (compResult > 0 && itr2.hasNext())
+				{
+					s2 = itr2.next();
+				}
+				else
+				{
+					done = true;
+				}
+			}
+		}
+
+		return total;
+	}
+
+	@Override
+	public void updateScores(ArrayList<Integer> scores) {
+		//  Auto-generated method stub
+		
+	}
+	
+	/**
+	 * Finds all the 7-letter words that are within 1 character of creating.
+	 * @param letters
+	 * @return
+	 */
+	private LinkedList<String> findAvailableWords(ArrayList<Character> letters) 
+	{
+		String s = "";
+		for(int i=0; i<letters.size(); i++)
+		{
+			s += letters.get(i);
+		}
+
+		LinkedList<String> newList = new LinkedList<String>();
+		ListIterator<String> itr1 = (ListIterator<String>) allWords.iterator();
+
+		if (itr1.hasNext())
+		{
+			String current;
+			while (itr1.hasNext()) {
+				current = itr1.next();
+				
+				if( withinOneLetter(s, current) == true )
+				{
+					newList.add(s);
+				}
+			}
+		}
+
+		return newList;
+	}
+	
+	/**
+	 * Determines if a 7-letter word is missing at most 1 character from our rack to be created. 
+	 * @param letters
+	 * @param current
+	 * @return
+	 */
+	private boolean withinOneLetter(String letters, String current)
+	{
+		// TODO can be made faster w/ a hashset
+		boolean found;
+		int numMissingLetters = 0;
+		for(int i=0; i<current.length(); i++)
+		{
+			found = false;
+			for(int j=0; j<letters.length(); j++)
+			{
+				if(current.charAt(i) == letters.charAt(j))
+				{
+					found = true;
+					j = letters.length();
+				}
+			}
+			if( !found ){
+				if(numMissingLetters == 0)
+					numMissingLetters++;
+				else
+					return false;
+			}
+		}
+		return true;
 	}
 }

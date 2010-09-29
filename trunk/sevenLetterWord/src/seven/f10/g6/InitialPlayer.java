@@ -18,11 +18,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
 public class InitialPlayer implements Player {
-	@Override
-	public void updateScores(ArrayList<Integer> scores) {
-		// TODO Auto-generated method stub
-		
-	}
+
 	static {
 		BasicConfigurator.configure();
 		Logger.getRootLogger().setLevel(org.apache.log4j.Level.ERROR);
@@ -165,7 +161,7 @@ public class InitialPlayer implements Player {
 			//deduct point from bidding. Amount = second highest point
 			//find amount of second highest bid.
 			int secondBid = 0;
-			Bid.wonletter();
+			Bid.wonletter(b.getTargetLetter());
 			for(int i = 0;i<b.getBidvalues().size();i++){
 				if(secondBid<b.getBidvalues().get(i)){
 					secondBid = b.getBidvalues().get(i);
@@ -222,6 +218,12 @@ public class InitialPlayer implements Player {
 		Bid.reset();
 		currentPoint += bestword.score;
 		return bestword.word;
+	}
+
+	@Override
+	public void updateScores(ArrayList<Integer> scores) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

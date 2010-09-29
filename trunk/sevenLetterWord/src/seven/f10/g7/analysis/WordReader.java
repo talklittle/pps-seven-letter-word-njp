@@ -88,7 +88,7 @@ public class WordReader {
         	if(ScrabbleBag.debug) System.err.println("Failed to build trie from dictionary.");
         } else {
 	        try {
-	            FileOutputStream fos = new FileOutputStream("dictionary.obj");
+	            FileOutputStream fos = new FileOutputStream("./src/seven/f10/g7/dictionary.obj");
 	            ObjectOutputStream out = new ObjectOutputStream(fos);
 	            out.writeObject(trie);
 	            out.close();

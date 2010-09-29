@@ -12,7 +12,7 @@ public class SevenLetterStrategy implements Strategy {
     private double cutOff=0.05;
     
     @Override
-    public int valuate(Letter letter, int instancesRemaining,
+    public int valuate(Letter letter, double instancesRemaining,
             String rack, ArrayList<PlayerBids> bidHistory) {
         int bidAmount = 1;
         TrieNode baseNode = ClassyPlayer.trie.findNode(rack);
@@ -33,5 +33,13 @@ public class SevenLetterStrategy implements Strategy {
         }
         return bidAmount;
     }
+
+	@Override
+	public double resolve(char letter, String bestWordBefore,
+			String bestWordAfter, double combinedLetterToChildrenRatio,
+			double combinedAverageScoreRatio) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
 }

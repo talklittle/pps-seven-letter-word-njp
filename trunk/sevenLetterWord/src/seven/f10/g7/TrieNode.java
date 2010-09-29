@@ -1,7 +1,10 @@
 package seven.f10.g7;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
+
+import seven.f10.g7.strategies.Strategy;
 
 public class TrieNode implements Serializable {
 	private static final long serialVersionUID = -2823769644359966373L;
@@ -48,7 +51,7 @@ public class TrieNode implements Serializable {
 	
 	public double getCharacterCountToWordCountRatio(char c)
 	{
-	    return numCharOccurances[ScrabbleBag.getIndex(c)] / (double) numWords;
+	    return Double.isNaN(numCharOccurances[ScrabbleBag.getIndex(c)] / (double) numWords) ? .01 : numCharOccurances[ScrabbleBag.getIndex(c)] / (double) numWords;
 	}
 	
 	public TrieNode() {
@@ -175,7 +178,7 @@ public class TrieNode implements Serializable {
         
         for (String s : toSearch) {
             TrieNode temp = findBestNode((new Word(s).getSorted()), bestNode, 0, nodeMode, minimumDepth);
-            if(ScrabbleBag.debug) { Word ws = new Word(s); System.err.println("TEMP WORD IS: " + temp + " with score " + (temp != null && temp.getWord() != null ? temp.getWord().getScore() : "-1") + "\tFrom search string: " + (ws != null ? ws.getSorted() : "") + " with score " + (ws != null ? ws.getScore() : "-1")); }
+            //if(ScrabbleBag.debug) { Word ws = new Word(s); System.err.println("TEMP WORD IS: " + temp + " with score " + (temp != null && temp.getWord() != null ? temp.getWord().getScore() : "-1") + "\tFrom search string: " + (ws != null ? ws.getSorted() : "") + " with score " + (ws != null ? ws.getScore() : "-1")); }
             if (temp != null) {
                 int tempScore = (temp.hasWord() ? temp.getWord().getScore() : (int) temp.getAverageScore(false));
                 
@@ -183,7 +186,7 @@ public class TrieNode implements Serializable {
                     bestScore = tempScore;
                     bestNode = temp;
                 }
-                if(ScrabbleBag.debug) System.err.println("BEST WORD IS: " + temp);
+                //if(ScrabbleBag.debug) System.err.println("BEST WORD IS: " + temp);
             }
         }
 
@@ -218,4 +221,69 @@ public class TrieNode implements Serializable {
 	public String toString() {
 	    return word != null ? word.toString() : "WORD_IS_NULL";
 	}
+	
+	public double calculateBid(Strategy strategy, String rack, int wasteTolerance, char letter) 
+	{
+	    HashSet<String> combinations = ScrabbleBag.getCombinations((new Word(rack)).getSorted(), rack.length() - wasteTolerance, Math.min(rack.length(), ScrabbleBag.MAX_WORD_LENGTH-1));
+	    double combinedScore = 0;
+	    
+	    for(String s : combinations)
+	    {
+	        TrieNode bestWordBeforeLetter = findBestNode((new Word(s).getSorted()), null, 0, false, rack.length() - wasteTolerance);
+	        TrieNode bestWordAfterLetter = findBestNode((new Word(s+letter).getSorted()), null, 0, false, rack.length() - wasteTolerance);
+	        combinedScore += calculateBid(strategy, s, rack.length(), rack.length() - wasteTolerance, letter, 0, bestWordBeforeLetter, bestWordAfterLetter, new ArrayList<Double>(), 1, 0, 0);
+	    }
+	    return combinedScore / combinations.size();
+	}
+	
+	private double calculateBid(Strategy strategy, String rack, int origRackLength, int minimumDepth, char letter, int position, 
+	        TrieNode bestWordBeforeLetter, TrieNode bestWordAfterLetter, ArrayList<Double> combinedLettertoChildrenRatio,
+	        double previousScore, double combinedScoreRatio, int numCombinedScores) 
+    {
+	    if(position >= minimumDepth) {
+            double multiplier = 1 - (origRackLength - position)/10.; //TODO: check for off-by-one
+            if(hasWord())
+            {
+                combinedScoreRatio += ((getAverageScore(false) * multiplier) / Math.max(previousScore, 1));
+                previousScore = getAverageScore(false) * multiplier;
+                numCombinedScores++;                
+            }
+            combinedLettertoChildrenRatio.add(getCharacterCountToWordCountRatio(letter) * multiplier);
+        }
+	    
+	    // base case
+	    if(position == rack.length()) {
+	        TrieNode finalNode = getChild(letter);
+	        if(finalNode != null)
+	        {
+	            double multiplier = 1 - (origRackLength - position)/10.; //TODO: check for off-by-one
+	            if(finalNode.hasWord())
+	            {
+	                previousScore = getAverageScore(false) * multiplier;
+	                combinedScoreRatio += ((finalNode.getAverageScore(false) * multiplier) / Math.max(previousScore, 1));
+	                numCombinedScores++;	            	                
+	            }
+	        }
+	        
+	        String bestWordBefore = bestWordBeforeLetter != null ? (bestWordBeforeLetter.hasWord() ? bestWordBeforeLetter.getWord().toString() : "") : "";
+	        String bestWordAfter = bestWordAfterLetter != null ? (bestWordAfterLetter.hasWord() ? bestWordAfterLetter.getWord().toString() : "") : "";
+	        
+	        double bestRatio = 0;
+	        for(double d : combinedLettertoChildrenRatio) {
+	            if(d > bestRatio)
+	                bestRatio = d;
+	        }
+	        
+	        
+	        return strategy.resolve(letter, 
+	                bestWordBefore,
+	                bestWordAfter,
+	                bestRatio,
+	                Double.isNaN(combinedScoreRatio / numCombinedScores) ? 0 : combinedScoreRatio / numCombinedScores);
+	    }
+	    if(this.getChild(rack.charAt(position)) == null)
+	        return 1;
+	    
+	    return this.getChild(rack.charAt(position)).calculateBid(strategy, rack, origRackLength, minimumDepth, letter, position +1, bestWordBeforeLetter, bestWordAfterLetter, combinedLettertoChildrenRatio, previousScore, combinedScoreRatio, numCombinedScores);
+    }
 }

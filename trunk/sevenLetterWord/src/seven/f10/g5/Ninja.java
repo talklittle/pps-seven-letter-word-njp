@@ -14,15 +14,20 @@ import seven.ui.SecretState;
 
 
 public class Ninja implements Player {
-	//word or getword()?
-	@Override
+  
 	public void updateScores(ArrayList<Integer> scores) {
 		// TODO Auto-generated method stub
+		log.debug("SCORES:");
+		for(int i = 0; i < scores.size(); i++)
+		{
+			log.debug("next one: " + scores.get(i));
+		}
 		
 	}
+	
 	static final Word[] wordlist; // only the 7 letter words, without anagrams 
 	static final Word[] wordlistall;
-	protected Logger log = Logger.getLogger(Ninja.class);
+	protected Logger log = Logger.getLogger(this.getClass());
 	static private HashMap freq = new HashMap(26);
 	static {
 		BufferedReader r, r2;
@@ -71,6 +76,14 @@ public class Ninja implements Player {
 	int previousBet;
 	double expectedScore;
 	double offset;
+	double avgBidAmount = 7.5;
+	//int numLettersThisRound;
+	int totalLettersAvailable;
+	
+	boolean wonLastBid = false;
+	boolean wonBid2RoundsAgo = false;
+	boolean wonBid3RoundsAgo = false;
+	
 	public int Bid(Letter bidLetter, ArrayList<PlayerBids> PlayerBidList,
 			int total_rounds, ArrayList<String> PlayerList,
 			SecretState secretstate, int PlayerID) {
@@ -78,22 +91,15 @@ public class Ninja implements Player {
 			cachedBids = PlayerBidList;
 		}
 		
-		int numBidsSoFar = PlayerBidList.size() + 1;
-		int numBidsInThisRound = numBidsSoFar % (8*PlayerList.size());
-		
 		if(PlayerBidList.size() == 0)
 		{
 			initHashMap();
 		}
 		
-		numLettersSoFar = PlayerBidList.size() + secretstate.getSecretLetters().size()*PlayerList.size();
-		if(numLettersSoFar % (8*PlayerList.size()) == 0) //new round
-		{
-			currentLetters = null;
-			currentLettersall = null;
-			initHashMap();
-		}
-
+		numBidsInThisRound++;
+		totalLettersAvailable = 8*PlayerList.size() - numBidsInThisRound - PlayerList.size()*secretstate.getSecretLetters().size();
+		log.debug("total letters available: " + totalLettersAvailable);
+		
 		if (null == currentLetters) {
 			currentLetters = new ArrayList<Character>();
 			currentLettersall = new ArrayList<Character>();
@@ -107,11 +113,31 @@ public class Ninja implements Player {
 			}
 		} else {
 			if (cachedBids.size() > 0) {
+				wonBid3RoundsAgo = wonBid2RoundsAgo;
+				wonBid2RoundsAgo = wonLastBid;
 				checkBid(cachedBids.get(cachedBids.size() - 1));
 			}
 		}
 		
 		
+		if(wonLastBid == false && wonBid2RoundsAgo == false && wonBid3RoundsAgo == false && previousBet > 0)
+		{
+			avgBidAmount += 0.0;
+			log.debug("the bid amount was increased to " + avgBidAmount + " \n");
+		}
+		
+		/*double factor = Math.log((double)PlayerList.size()) + 1;
+		
+		if(wonLastBid == false && wonBid2RoundsAgo == false && previousBet > -7)
+		{
+			probInflator = probInflator - (probInflator - 1.10)/factor;
+			log.debug("probInflator just went down.  It is now" + probInflator);
+		}
+		else if(wonLastBid == true)
+		{
+			probInflator = probInflator + (1.25 - probInflator)/1.3;
+			log.debug("probInflator just went up. It is now" + probInflator);
+		}*/
 		
         // Get a set of the entries
         Set set = freq.entrySet();
@@ -121,7 +147,11 @@ public class Ninja implements Player {
         Integer prevfreq= (Integer)freq.get(bidLetter.getAlphabet());
         freq.put( (char)bidLetter.getAlphabet(), new Integer (prevfreq+1));
         
-        printHashMap();
+        //printHashMap();
+        
+        //log.debug("wonLastBid: " + wonLastBid);
+        //log.debug("wonBid2RoundsAgo: " + wonBid2RoundsAgo);
+        //log.debug("wonBid3RoundsAgo: " + wonBid3RoundsAgo);
         
 		log.debug("\ncurrent letters: " + currentLetters);
 		log.debug("\ncurrent letters all: " + currentLettersall);
@@ -130,13 +160,15 @@ public class Ninja implements Player {
 		
 		double expectedScoreIfWinLetter = getExpectedScoreFromLetters(currentLetters, bidLetter);
 		log.debug("the letter being bid on is: " + bidLetter.getAlphabet());
-		log.debug(" expected score if you win letter: " + expectedScoreIfWinLetter);
+		log.debug(" expected score if you win letter: " + expectedScoreIfWinLetter + "\n");
 		
 		previousBet = (int)(expectedScoreIfWinLetter - expectedScoreWithoutLetterUpForBid);
 		expectedScore = expectedScoreIfWinLetter;
 		
+		log.debug("num bids in this round: " + numBidsInThisRound + "\n");
 		
-		if(expectedScoreIfWinLetter - expectedScoreWithoutLetterUpForBid <= 0)
+		
+		if((expectedScoreIfWinLetter - expectedScoreWithoutLetterUpForBid) <= .5)
 			return 0;
 			
 		return (int)(expectedScoreIfWinLetter - expectedScoreWithoutLetterUpForBid + .5); 
@@ -152,7 +184,7 @@ public class Ninja implements Player {
 		while(i.hasNext())
 		{
 			Map.Entry me = (Map.Entry)i.next();
-			//log.debug(me.getKey() + ": " + me.getValue());
+			log.debug(me.getKey() + ": " + me.getValue());
 		}
 	}
 	
@@ -201,9 +233,154 @@ public class Ninja implements Player {
 				currentLettersall.add(b.getTargetLetter().getAlphabet());
 				log.debug("Previous bet was less than -3 or took expected score to 0 so this letter not added to currentLetters");
 			}
+			wonLastBid = true;
+			log.debug("the letter added was " + b.getTargetLetter().getAlphabet());
+		}
+		else
+		{
+			wonLastBid = false;
 		}
 	}
 
+	private double getExpectedScoreFromLetters(ArrayList<Character> letters)
+	{
+		double maxScore = 0, subsetScore;
+		
+		if(letters.size() == 0)
+		{
+			maxScore = getExpectedScoreFromLetters(letters, false);
+		}
+		
+		if(letters.size() == 1)
+		{
+			maxScore = getExpectedScoreFromLetters(letters, false);
+			subsetScore = getExpectedScoreFromLetters(new ArrayList<Character>(), false);
+			if(subsetScore > maxScore)
+			{
+				maxScore = subsetScore;
+			}
+		}
+		else if(letters.size() == 2)
+		{
+			maxScore = getExpectedScoreFromLetters(letters, false);
+			for(int i = 0; i < 2; i++)
+			{
+				subsetScore = getExpectedScoreFromLetters(removeLetter(letters, new int[] {i}), false);
+				if(subsetScore > maxScore)
+				{
+					maxScore = subsetScore;
+				}
+			}
+			
+		}
+		else if(letters.size() == 3)
+		{
+			maxScore = getExpectedScoreFromLetters(letters, false);
+			for(int i = 0; i < 3; i++)
+			{
+				subsetScore = getExpectedScoreFromLetters(removeLetter(letters, new int[] {i}), false);
+				if(subsetScore > maxScore)
+				{
+					maxScore = subsetScore;
+				}
+			}
+		}
+		
+		else if(letters.size() == 4)
+		{
+			maxScore = getExpectedScoreFromLetters(letters, false);
+			for(int i = 0; i < 4; i++)
+			{
+				subsetScore = getExpectedScoreFromLetters(removeLetter(letters, new int[] {i}), false);
+				if(subsetScore > maxScore)
+				{
+					maxScore = subsetScore;
+				}
+			}
+		}
+		
+		else if(letters.size() == 5)
+		{
+			maxScore = getExpectedScoreFromLetters(letters, false);
+			for(int i = 0; i < 5; i++)
+			{
+				subsetScore = getExpectedScoreFromLetters(removeLetter(letters, new int[] {i}), false);
+				if(subsetScore > maxScore)
+				{
+					maxScore = subsetScore;
+				}
+			}
+		}
+		else if(letters.size() == 6)
+		{
+			maxScore = getExpectedScoreFromLetters(letters, false);
+			for(int i = 0; i < 6; i++)
+			{
+				subsetScore = getExpectedScoreFromLetters(removeLetter(letters, new int[] {i}), false);
+				if(subsetScore > maxScore)
+				{
+					maxScore = subsetScore;
+				}
+			}
+		}
+		
+		else if(letters.size() == 7)
+		{
+			maxScore = getExpectedScoreFromLetters(letters, false);
+			for(int i = 0; i < 7; i++)
+			{
+				subsetScore = getExpectedScoreFromLetters(removeLetter(letters, new int[] {i}), false);
+				if(subsetScore > maxScore)
+				{
+					maxScore = subsetScore;
+				}
+			}
+		}
+		else if(letters.size() == 8)
+		{
+			maxScore = getExpectedScoreFromLetters(letters, false);
+			for(int i = 0; i < 8; i++)
+			{
+				subsetScore = getExpectedScoreFromLetters(removeLetter(letters, new int[] {i}), false);
+				if(subsetScore > maxScore)
+				{
+					maxScore = subsetScore;
+				}
+			}
+		}
+		else if(letters.size() == 9)
+		{
+			maxScore = getExpectedScoreFromLetters(letters, false);
+			for(int i = 0; i < 9; i++)
+			{
+				subsetScore = getExpectedScoreFromLetters(removeLetter(letters, new int[] {i}), false);
+				if(subsetScore > maxScore)
+				{
+					maxScore = subsetScore;
+				}
+			}
+		}
+		return maxScore;
+	}
+	
+	private ArrayList<Character> removeLetter(ArrayList<Character> letters, int[] letterNum)
+	{
+		ArrayList<Character> lettersCopy = new ArrayList<Character>();
+		
+		for(int i = 0; i < letters.size(); i++)
+		{
+			lettersCopy.add(letters.get(i));
+		}
+		for(int i = 0; i < letterNum.length; i++)
+		{
+			if(letterNum[i] < lettersCopy.size())
+			{
+				lettersCopy.remove(letterNum[i]);
+			}
+		}
+		return lettersCopy; //else, letterNum is outside the bounds of lettersCopy, so just return it unchanged
+	}
+	
 	private double getExpectedScoreFromLetters(ArrayList<Character> letters, Letter additionalLetter)
 	{
 	
@@ -213,11 +390,156 @@ public class Ninja implements Player {
 		}
 		
 		newLetters.add(additionalLetter.getAlphabet());
-		return getExpectedScoreFromLetters(newLetters);
+		
+		double maxScore = 0, subsetScore;
+		
+		if(newLetters.size() == 1)
+		{
+			maxScore = getExpectedScoreFromLetters(newLetters, true);
+		}
+		
+		if(newLetters.size() == 2)
+		{
+			maxScore = getExpectedScoreFromLetters(newLetters, true);
+			subsetScore = getExpectedScoreFromLetters(removeLetter(newLetters, new int[] {0}), true);
+			if(subsetScore > maxScore)
+			{
+				maxScore = subsetScore;
+			}
+		}
+		else if(newLetters.size() == 3)
+		{
+			maxScore = getExpectedScoreFromLetters(newLetters, true);
+			for(int i = 0; i < 2; i++)
+			{
+				subsetScore = getExpectedScoreFromLetters(removeLetter(newLetters, new int[] {i}), true);
+				if(subsetScore > maxScore)
+				{
+					maxScore = subsetScore;
+				}
+			}
+			
+		}
+		
+		else if(newLetters.size() == 4)
+		{
+			maxScore = getExpectedScoreFromLetters(newLetters, true);
+			for(int i = 0; i < 3; i++)
+			{
+				subsetScore = getExpectedScoreFromLetters(removeLetter(newLetters, new int[] {i}), true);
+				if(subsetScore > maxScore)
+				{
+					maxScore = subsetScore;
+				}
+			}
+		}
+		
+		else if(newLetters.size() == 5)
+		{
+			maxScore = getExpectedScoreFromLetters(newLetters, true);
+			for(int i = 0; i < 4; i++)
+			{
+				subsetScore = getExpectedScoreFromLetters(removeLetter(newLetters, new int[] {i}), true);
+				if(subsetScore > maxScore)
+				{
+					maxScore = subsetScore;
+				}
+			}
+		}
+		else if(newLetters.size() == 6)
+		{
+			maxScore = getExpectedScoreFromLetters(newLetters, true);
+			for(int i = 0; i < 5; i++)
+			{
+				subsetScore = getExpectedScoreFromLetters(removeLetter(newLetters, new int[] {i}), true);
+				if(subsetScore > maxScore)
+				{
+					maxScore = subsetScore;
+				}
+			}
+		}
+		
+		else if(newLetters.size() == 7)
+		{
+			maxScore = getExpectedScoreFromLetters(newLetters, true);
+			for(int i = 0; i < 6; i++)
+			{
+				subsetScore = getExpectedScoreFromLetters(removeLetter(newLetters, new int[] {i}), true);
+				if(subsetScore > maxScore)
+				{
+					maxScore = subsetScore;
+				}
+			}
+		}
+		
+		else if(newLetters.size() == 8)
+		{
+			maxScore = getExpectedScoreFromLetters(newLetters, true);
+			for(int i = 0; i < 7; i++)
+			{
+				subsetScore = getExpectedScoreFromLetters(removeLetter(newLetters, new int[] {i}), true);
+				if(subsetScore > maxScore)
+				{
+					maxScore = subsetScore;
+				}
+			}
+		}
+		else if(newLetters.size() == 9)
+		{
+			maxScore = getExpectedScoreFromLetters(newLetters, true);
+			for(int i = 0; i < 8; i++)
+			{
+				subsetScore = getExpectedScoreFromLetters(removeLetter(newLetters, new int[] {i}), true);
+				if(subsetScore > maxScore)
+				{
+					maxScore = subsetScore;
+				}
+			}
+		}
+		else if(newLetters.size() == 10)
+		{
+			maxScore = getExpectedScoreFromLetters(newLetters, true);
+			for(int i = 0; i < 9; i++)
+			{
+				subsetScore = getExpectedScoreFromLetters(removeLetter(newLetters, new int[] {i}), true);
+				if(subsetScore > maxScore)
+				{
+					maxScore = subsetScore;
+				}
+			}
+		}
+		
+		return maxScore;
+		
+		//return getExpectedScoreFromLetters(newLetters, true);
 	}
 	
-	private double getExpectedScoreFromLetters(ArrayList<Character> letters)
+	private double getExpectedScoreFromLetters(ArrayList<Character> letters, boolean afterWinningLetter)
 	{
+		double letterAvailability =  (double)totalLettersAvailable/(7.0 - letters.size());
+		double probInflator;
+		if(afterWinningLetter == false)
+		{
+			log.debug("the number of letters available is: " + totalLettersAvailable);
+			if(totalLettersAvailable == 0)
+			{
+				probInflator = 0; //No chance of getting a letter if there are none available.
+			}
+			else if(letters.size() == 7)
+			{
+				probInflator = 1; //This won't actually be used. 
+			}
+			else
+			{
+				probInflator = 1.20 - .30/(letterAvailability);
+			}
+		}
+		else
+		{
+			probInflator = 1.20;
+		}
+		//log.debug("The inflator is: " + probInflator);
+		
 		double expectedScore = 0.0;
 		for(int i = 0; i < wordlist.length; i++)
 		{
@@ -236,9 +558,7 @@ public class Ninja implements Player {
 					if(wordCopy[w] == letters.get(j) && hasLetter == false)
 					{
 						hasLetter = true;
-						//log.debug("found " + wordCopy[w] + " at index " + w);
 						wordCopy[w] = '_'; //get rid of that letter because it's already been seen
-						//log.debug("the wordCopy char array is now: " + wordCopy);
 					}
 				}
 				if(hasLetter == false)
@@ -248,18 +568,14 @@ public class Ninja implements Player {
 			}
 			if(wordHasAllLetters == true) //the current word in the dictionary has all of the letters in our rack. 
 			{
-				double expectedScoreFromThisWord = getExpectedScoreFromWord(wordlist[i], wordCopy);
+				double expectedScoreFromThisWord = getExpectedScoreFromWord(wordlist[i], wordCopy, probInflator);
 				expectedScore = expectedScore + expectedScoreFromThisWord;
-			}
-			else
-			{
-				//log.debug("the word " + wordlist[i].word + " cannot be formed from your letters");
 			}
 		}
 		return expectedScore;
 	}
 	
-	private double getExpectedScoreFromWord(Word wordObj, char[] wordCopy)
+	private double getExpectedScoreFromWord(Word wordObj, char[] wordCopy, double probInflator)
 	{
 		String word = wordObj.word;
 		double prob = 1.0;
@@ -269,7 +585,7 @@ public class Ninja implements Player {
 			if(word.charAt(i) == wordCopy[i])
 			{
 				int num = (Integer)freq.get(word.charAt(i));
-				prob = prob * (1.45*((ScrabbleValues.getLetterFrequency(word.charAt(i)) - num)/(98.0 - numBidsInThisRound))); //I multiplied the probability by 2 because it is more likely that you are going to get letters that are needed to form a 7 letter word, since you will be bidding high on them. 
+				prob = prob * (probInflator*((ScrabbleValues.getLetterFrequency(word.charAt(i)) - num)/(98.0 - numBidsInThisRound))); //I multiplied the probability by inflator because it is more likely that you are going to get letters that are needed to form a 7 letter word, since you will be bidding high on them.
 				numLettersNeeded++;
 			}
 		}
@@ -278,13 +594,11 @@ public class Ninja implements Player {
 		//log.debug("      probability of getting this word is" + prob);
 		//log.debug("the raw score of this word is" + ScrabbleValues.getWordScore(wordObj.word));
 		//log.debug("the amount you are likely to bet to get this word is" + 5*numLettersNeeded);
-		double expectedScore = prob * (ScrabbleValues.getWordScore(wordObj.word) - 7.5*numLettersNeeded); //the " - 5*numLettersNeeded" is used to account for how many points you will lose in bidding for these letters.  It is assumed that you will lose about 5 per letter, but look into this more to see what a better average is (look at how much you end up paying on average). Maybe this value will be different depending on the letter (do you always end up betting more for a's then for z's?)
+		double expectedScore = prob * (ScrabbleValues.getWordScore(wordObj.word) - avgBidAmount*numLettersNeeded); //the " - 5*numLettersNeeded" is used to account for how many points you will lose in bidding for these letters.  It is assumed that you will lose about 5 per letter, but look into this more to see what a better average is (look at how much you end up paying on average). Maybe this value will be different depending on the letter (do you always end up betting more for a's then for z's?)
 		
 		return expectedScore; 
 	}
 
-	
-	//check that this is working 
 	private int factorial(int x)
 	{
 		int answer = 1;
@@ -298,7 +612,7 @@ public class Ninja implements Player {
 	public void Register() {
 		// no-op
 	}
-
+	
 	public String returnWord() {
 		checkBid(cachedBids.get(cachedBids.size() - 1));
 		char c[] = new char[currentLettersall.size()];
@@ -318,9 +632,14 @@ public class Ninja implements Player {
 		}
 		currentLetters = null;
 		currentLettersall = null;
+		initHashMap();
+		wonLastBid = false;
+		wonBid2RoundsAgo = false;
+		wonBid3RoundsAgo = false;
+		avgBidAmount = 7.5;
+		numBidsInThisRound = 0;
+		log.debug("NEW ROUND!\n");
 		return bestword.word;
 	}
-
-
 	
 }

@@ -35,7 +35,7 @@ public class ScrabbleBag {
     }
     
     public static HashSet<String> getCombinations(String s) {
-        return ScrabbleBag.getCombinations(s, 1, s.length());
+        return ScrabbleBag.getCombinations(s, 1, Math.min(s.length(), MAX_WORD_LENGTH));
     }
     
     public static HashSet<String> getCombinationsOfLength(String s, int length) {
